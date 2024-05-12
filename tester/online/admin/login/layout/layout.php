@@ -31,8 +31,14 @@
     <main class="w3-container w3-row w3-text-black w3-display-container">
         <div class="w3-container w3-center w3-display-topmiddle w3-block w3-col s12 m11 l9 main w3-row"> 
             <?php
-                include($_SESSION["site_address"]);
-                
+                switch ($_SESSION["site"]) {
+                    case '1024':
+                        include("admin_account_dashboard.php");
+                        break;
+                    default:
+                        include("admin_login_form.php");
+                        break;
+                } 
             ?>
         </div>
     </main>
