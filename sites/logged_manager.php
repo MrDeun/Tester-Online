@@ -1,13 +1,5 @@
 <h1>Konta</h1>
 <?php
-    // Dane do połączenia z bazą danych MySQL
-    $host = 'localhost'; // Adres hosta bazy danych
-    $username = 'root'; // Nazwa użytkownika bazy danych
-    $password = ''; // Hasło użytkownika bazy danych
-    $database = 'tester'; // Nazwa bazy danych
-
-    // Nawiązanie połączenia z bazą danych
-    $connection = new mysqli($host, $username, $password, $database);
 
     // Sprawdzenie czy udało się połączyć z bazą danych
     if ($connection->connect_error) {
@@ -27,9 +19,17 @@
     if ($result->num_rows > 0) {
         // Wyświetlenie danych w tabeli
         echo '<table class="w3-table-all">';
-        echo "<tr><th>ID</th><th>Login</th><th>Name</th><th>Surname</th><th>Email</th><th>Number</th><th>Change Password</ht></tr>";
+        echo "<tr><th>ID</th><th>Login</th><th>Name</th><th>Surname</th><th>Email</th><th>Number</th><th>Change Password</th></tr>";
         while($row = $result->fetch_assoc()) {
-            echo "<tr><td>".$row["id"]."</td><td>".$row["Login"]."</td><td>".$row["Name"]."</td><td>".$row["Surname"]."</td><td>".$row["Email"]."</td><td>".$row["Number"]."</td><td><button onclick=".'"'."ChangePasswordForm(".$row["id"].", '".$row["Login"]."')".'"'.">Zmień Hasło</button></td></tr>";
+            echo "<tr>
+                <td>".$row["id"]."</td>
+                <td>".$row["Login"]."</td>
+                <td>".$row["Name"]."</td>
+                <td>".$row["Surname"]."</td>
+                <td>".$row["Email"]."</td>
+                <td>".$row["Number"]."</td>
+                <td><button onclick=".'"'."ChangePasswordForm(".$row["id"].", '".$row["Login"]."')".'"'.">Zmień Hasło</button></td>
+            </tr>";
         }
         echo "</table>";
     } else {
@@ -47,7 +47,7 @@
         <label for="PC_password">Hasło:</label><br>
         <input type="password" id="PC_password" name="PC_password" required><br>
         <span class="show-password w3-button" onclick="togglePassword('PC_password')">Pokaż hasło</span><br>
-        <button type="submit" name="PC_submit">Dodaj konto</button>
+        <button type="submit" name="PC_submit" id="PC_submit">Dodaj konto</button>
     </form>
     <?php
         if(isset($_POST['PC_submit'])){
@@ -142,6 +142,5 @@
             echo("Login: $login <br>");
             echo("Hasło: $password <br>");
         }
-        $connection->close();
     ?>
 </div>

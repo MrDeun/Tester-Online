@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Tester Online <?php if(isset($_SESSION["title"])){echo('- '.$_SESSION["title"]);};?></title>
+    <title>Tester Online <?php if(isset($title)){echo('- '.$title);};?></title>
     <link rel="icon" type="image/x-icon" href="">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="wwwroot/css/layout.css">
@@ -31,8 +31,14 @@
     <main class="w3-container w3-row w3-text-black w3-display-container">
         <div class="w3-container w3-center w3-display-topmiddle w3-block w3-col s12 m11 l9 main w3-row"> 
             <?php
-                include($_SESSION["site_address"]);
-                
+                switch ($_SESSION["site"]) {
+                    case '1024':
+                        include("admin_account_dashboard.php");
+                        break;
+                    default:
+                        include("admin_login_form.php");
+                        break;
+                } 
             ?>
         </div>
     </main>
