@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Maj 05, 2024 at 09:41 PM
+-- Generation Time: Maj 21, 2024 at 03:58 AM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -91,6 +91,16 @@ CREATE TABLE `answers` (
   `points` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `answers`
+--
+
+INSERT INTO `answers` (`answer_id`, `text`, `correct`, `question_id`, `points`) VALUES
+(17, 'Tak', 0, 2, NULL),
+(18, 'Nie', 0, 2, NULL),
+(78, 'Nie', 0, 1, NULL),
+(79, 'Super', 1, 1, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -100,8 +110,15 @@ CREATE TABLE `answers` (
 CREATE TABLE `groups` (
   `id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
-  `count` int(11) NOT NULL
+  `account_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `groups`
+--
+
+INSERT INTO `groups` (`id`, `name`, `account_id`) VALUES
+(9, 'Grupa 1', 2);
 
 -- --------------------------------------------------------
 
@@ -130,6 +147,26 @@ CREATE TABLE `link_account_activated_test_answer` (
 -- --------------------------------------------------------
 
 --
+-- Struktura tabeli dla tabeli `link_group_questions`
+--
+
+CREATE TABLE `link_group_questions` (
+  `id` int(11) NOT NULL,
+  `question_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `link_group_questions`
+--
+
+INSERT INTO `link_group_questions` (`id`, `question_id`, `group_id`) VALUES
+(6, 2, 9),
+(37, 1, 9);
+
+-- --------------------------------------------------------
+
+--
 -- Struktura tabeli dla tabeli `link_organisations_accounts`
 --
 
@@ -150,13 +187,14 @@ INSERT INTO `link_organisations_accounts` (`id`, `account_id`, `organisation_id`
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `link_test_question`
+-- Struktura tabeli dla tabeli `link_test_groups`
 --
 
-CREATE TABLE `link_test_question` (
+CREATE TABLE `link_test_groups` (
   `id` int(11) NOT NULL,
   `test_id` int(11) NOT NULL,
-  `question_id` int(11) NOT NULL
+  `group_id` int(11) NOT NULL,
+  `question_count` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -189,9 +227,16 @@ CREATE TABLE `questions` (
   `id_question` int(11) NOT NULL,
   `opened` tinyint(1) NOT NULL,
   `text` text NOT NULL,
-  `group_id` int(11) DEFAULT NULL,
   `points` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `questions`
+--
+
+INSERT INTO `questions` (`id_question`, `opened`, `text`, `points`) VALUES
+(1, 0, 'Czy się udało?', 1000),
+(2, 0, 'Czy się udało?', 1000);
 
 -- --------------------------------------------------------
 
@@ -254,7 +299,8 @@ ALTER TABLE `answers`
 -- Indeksy dla tabeli `groups`
 --
 ALTER TABLE `groups`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `account_id` (`account_id`);
 
 --
 -- Indeksy dla tabeli `link_account_activated_test`
@@ -273,6 +319,14 @@ ALTER TABLE `link_account_activated_test_answer`
   ADD KEY `link_account_activated_test_id` (`link_account_activated_test_id`);
 
 --
+-- Indeksy dla tabeli `link_group_questions`
+--
+ALTER TABLE `link_group_questions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `group_id` (`group_id`),
+  ADD KEY `question_id` (`question_id`);
+
+--
 -- Indeksy dla tabeli `link_organisations_accounts`
 --
 ALTER TABLE `link_organisations_accounts`
@@ -281,12 +335,12 @@ ALTER TABLE `link_organisations_accounts`
   ADD KEY `school_id` (`organisation_id`);
 
 --
--- Indeksy dla tabeli `link_test_question`
+-- Indeksy dla tabeli `link_test_groups`
 --
-ALTER TABLE `link_test_question`
+ALTER TABLE `link_test_groups`
   ADD PRIMARY KEY (`id`),
   ADD KEY `test_id` (`test_id`),
-  ADD KEY `question_id` (`question_id`);
+  ADD KEY `link_test_question_ibfk_2` (`group_id`);
 
 --
 -- Indeksy dla tabeli `organisations`
@@ -299,8 +353,7 @@ ALTER TABLE `organisations`
 -- Indeksy dla tabeli `questions`
 --
 ALTER TABLE `questions`
-  ADD PRIMARY KEY (`id_question`),
-  ADD KEY `group_name` (`group_id`);
+  ADD PRIMARY KEY (`id_question`);
 
 --
 -- Indeksy dla tabeli `question_image`
@@ -329,6 +382,36 @@ ALTER TABLE `accounts`
   MODIFY `account_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT for table `answers`
+--
+ALTER TABLE `answers`
+  MODIFY `answer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+
+--
+-- AUTO_INCREMENT for table `groups`
+--
+ALTER TABLE `groups`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `link_group_questions`
+--
+ALTER TABLE `link_group_questions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+
+--
+-- AUTO_INCREMENT for table `link_test_groups`
+--
+ALTER TABLE `link_test_groups`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `questions`
+--
+ALTER TABLE `questions`
+  MODIFY `id_question` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- Constraints for dumped tables
 --
 
@@ -351,6 +434,12 @@ ALTER TABLE `answers`
   ADD CONSTRAINT `answers_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id_question`);
 
 --
+-- Constraints for table `groups`
+--
+ALTER TABLE `groups`
+  ADD CONSTRAINT `groups_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`);
+
+--
 -- Constraints for table `link_account_activated_test`
 --
 ALTER TABLE `link_account_activated_test`
@@ -365,6 +454,13 @@ ALTER TABLE `link_account_activated_test_answer`
   ADD CONSTRAINT `link_account_activated_test_answer_ibfk_2` FOREIGN KEY (`link_account_activated_test_id`) REFERENCES `link_account_activated_test` (`id`);
 
 --
+-- Constraints for table `link_group_questions`
+--
+ALTER TABLE `link_group_questions`
+  ADD CONSTRAINT `link_group_questions_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`),
+  ADD CONSTRAINT `link_group_questions_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id_question`);
+
+--
 -- Constraints for table `link_organisations_accounts`
 --
 ALTER TABLE `link_organisations_accounts`
@@ -372,17 +468,11 @@ ALTER TABLE `link_organisations_accounts`
   ADD CONSTRAINT `link_organisations_accounts_ibfk_2` FOREIGN KEY (`organisation_id`) REFERENCES `organisations` (`organisation_id`);
 
 --
--- Constraints for table `link_test_question`
+-- Constraints for table `link_test_groups`
 --
-ALTER TABLE `link_test_question`
-  ADD CONSTRAINT `link_test_question_ibfk_1` FOREIGN KEY (`test_id`) REFERENCES `test` (`id_test`),
-  ADD CONSTRAINT `link_test_question_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id_question`);
-
---
--- Constraints for table `questions`
---
-ALTER TABLE `questions`
-  ADD CONSTRAINT `questions_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`);
+ALTER TABLE `link_test_groups`
+  ADD CONSTRAINT `link_test_groups_ibfk_1` FOREIGN KEY (`test_id`) REFERENCES `test` (`id_test`),
+  ADD CONSTRAINT `link_test_groups_ibfk_2` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`);
 
 --
 -- Constraints for table `question_image`
