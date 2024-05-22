@@ -27,7 +27,7 @@
 </style>
 <div class="form-container">
     <h2>Logowanie</h2>
-    <form action="admin_login.php" method="post">
+    <form action="login.php" method="post">
         <div class="form-group">
             <label for="username">Login: 
                 <?php if(isset($_POST['error']) && $_POST['error'] == 1){
@@ -48,4 +48,3 @@
         <button type="submit">Zaloguj</button>
     </form>
 </div>
-

@@ -23,12 +23,3 @@ function ChangePasswordForm(id, login){
     PC_login.value = login;
     
 };
-function deleteTableRow(button){
-    var row = button.parentNode.parentNode;
-    var table = row.parentNode;
-    table.removeChild(row);
-}
-
-function addTestGroupRow(params) {
-    
-}
