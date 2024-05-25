@@ -1,10 +1,23 @@
 <?php
-    if(!isset($_POST['logged'])){
-        include("admin_login_form.php");
+
+    session_start();
+    if(!isset($_SESSION["site"])){
+        $_SESSION["site"] = "home";
     }
-    else if($_POST['logged'] == 1024){
-        include("admin_account_dashboard.php");
+    if(isset($_POST["site"])){
+        $_SESSION["site"] = $_POST["site"];       
+    }
+    switch ($_SESSION["site"]) {
+        case '1024':
+            $title = "ADMIN";
+            $logged = true;
+            break;
+        default:
+            $title = "LOGIN";
+            $logged = false;
+            break;
     }
 
 
+    include("layout/layout.php"); 
 ?>
