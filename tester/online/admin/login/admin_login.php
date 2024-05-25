@@ -14,12 +14,13 @@ echo '<form id="redirectForm" action="index.php" method="post">';
 $password_hash = hash('sha256', $password . $salt);
 if (($username == "admin") && ($password_hash === $stored_password_hash)) {
     // Hasło poprawne, przekazujemy do następnego pliku ID konta       
-    echo '<input type="hidden" name="logged" value="' . 1024 . '">';
+    echo '<input type="hidden" name="site" value="1024">';
     
 }
 else{
     // Brak użytkownika o podanym loginie lub niepoprawne hasło
     // Przekazujemy wartość błędu do poprzedniego pliku
+    echo '<input type="hidden" name="site" value="login_form">';
     echo '<input type="hidden" name="error" value="1">';
 
 }
