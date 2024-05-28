@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Maj 25, 2024 at 03:06 AM
+-- Generation Time: Maj 29, 2024 at 01:09 AM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -25,25 +25,139 @@ DELIMITER $$
 --
 -- Procedury
 --
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddAccountAndOrganization` (IN `p_login` VARCHAR(50), IN `p_password` VARCHAR(255), IN `p_organization_name` VARCHAR(100), IN `p_organization_address` VARCHAR(255), IN `p_organization_initials` VARCHAR(10))   BEGIN
+    DECLARE account_id INT;
+    DECLARE organization_id INT;
+
+    -- Dodanie nowego konta
+    INSERT INTO accounts (Login, Password_hash, Salt, Type)
+    VALUES (p_login, SHA2(CONCAT(p_password, HEX(RAND())), 256), HEX(RAND()), '1');
+
+    -- Pobranie ID dodanego konta
+    SET account_id = LAST_INSERT_ID();
+
+    -- Dodanie nowej organizacji
+    INSERT INTO organisations (Name, Address, initials)
+    VALUES (p_organization_name, p_organization_address, p_organization_initials);
+
+    -- Pobranie ID dodanej organizacji
+    SET organization_id = LAST_INSERT_ID();
+
+    -- Powiązanie konta z organizacją
+    INSERT INTO link_organisations_accounts (account_id, organisation_id)
+    VALUES (account_id, organization_id);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddNewAccount` (IN `p_login` VARCHAR(255), IN `p_password_hash` VARCHAR(255), IN `p_salt` VARCHAR(255), IN `p_name` VARCHAR(255), IN `p_surname` VARCHAR(255), IN `p_email` VARCHAR(255), IN `p_number` VARCHAR(255), IN `p_type` INT, IN `p_user_id` INT)   BEGIN
+    -- Dodanie nowego konta do tabeli accounts
+    INSERT INTO accounts (Login, Password_hash, Salt, Type)
+    VALUES (p_login, p_password_hash, p_salt, p_type);
+
+    -- Pobranie ostatnio wstawionego account_id
+    SET @last_account_id = LAST_INSERT_ID();
+
+    -- Dodanie nowych danych do tabeli account_data
+    INSERT INTO account_data (account_id, name, surname, email, number)
+    VALUES (@last_account_id, p_name, p_surname, p_email, p_number);
+
+    -- Pobranie ID z tabeli organisations
+    SELECT organisations.id INTO @organisation_id
+    FROM accounts
+    JOIN link_organisations_accounts ON accounts.account_id = link_organisations_accounts.account_id
+    JOIN organisations ON link_organisations_accounts.organisation_id = organisations.id
+    WHERE accounts.account_id = p_user_id;
+
+    -- Dodanie relacji między kontem a organizacją do tabeli link_organisations_accounts
+    INSERT INTO link_organisations_accounts (account_id, organisation_id)
+    VALUES (@last_account_id, @organisation_id);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ChangePassword` (IN `p_id` INT, IN `p_password_hash` VARCHAR(255), IN `p_salt` VARCHAR(32))   BEGIN
+    UPDATE accounts
+    SET Password_hash = p_password_hash, Salt = p_salt
+    WHERE account_id = p_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAccounts` (IN `user_id` INT)   BEGIN
+    SELECT accounts.account_id AS id, accounts.Login AS Login, account_data.name AS Name, account_data.surname AS Surname, account_data.email AS Email, account_data.number AS Number 
+    FROM (accounts INNER JOIN account_data ON accounts.account_id = account_data.account_id) 
+    JOIN link_organisations_accounts ON accounts.account_id = link_organisations_accounts.account_id 
+    JOIN organisations ON link_organisations_accounts.organisation_id = organisations.id 
+    WHERE (accounts.Type = '2' OR accounts.Type='3') 
+    AND organisations.id = 
+    (SELECT organisations.id FROM accounts JOIN link_organisations_accounts ON accounts.account_id = link_organisations_accounts.account_id JOIN organisations ON link_organisations_accounts.organisation_id = organisations.id WHERE accounts.account_id = user_id);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAccountsByType` (IN `p_type` INT)   BEGIN
+    SELECT accounts.account_id AS id, accounts.Login AS Login, organisations.Name AS Name, organisations.initials AS Initials, organisations.Address As Address 
+    FROM accounts 
+    JOIN link_organisations_accounts ON accounts.account_id = link_organisations_accounts.account_id 
+    JOIN organisations ON link_organisations_accounts.organisation_id = organisations.id 
+    WHERE accounts.Type = p_type;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRecentlyActivatedTests` (IN `user_id` INT)   BEGIN
+    SELECT activated_tests.id AS ID, tests.name AS Name, activated_tests.activation_time AS ActivationTime, COUNT(link_account_activated_tests.id) AS Participants
+    FROM activated_tests
+    JOIN tests ON activated_tests.test_id = tests.id
+    LEFT JOIN link_account_activated_tests ON activated_tests.id = link_account_activated_tests.activated_test_id
+    WHERE tests.id NOT IN (
+        SELECT tests.id
+        FROM tests
+        WHERE tests.account_id <> user_id
+    )
+    GROUP BY activated_tests.id, tests.name, activated_tests.activation_time
+    ORDER BY activated_tests.activation_time DESC
+    LIMIT 10;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetTestDetails` (IN `user_id` INT)   BEGIN
     SELECT 
-        test.id_test, 
-        test.name, 
-        test.time, 
-        COUNT(questions.id_question) AS question_count, 
+        tests.id, 
+        tests.name, 
+        tests.time, 
+        COUNT(questions.id) AS question_count, 
         SUM(questions.points) AS total_points
     FROM 
-        test 
-        LEFT JOIN link_test_groups ON test.id_test = link_test_groups.test_id
-        LEFT JOIN groups ON link_test_groups.group_id = groups.id
-        LEFT JOIN link_group_questions ON groups.id = link_group_questions.group_id
-        LEFT JOIN questions ON link_group_questions.question_id = questions.id_question
+        tests 
+        LEFT JOIN link_tests_groups ON tests.id = link_tests_groups.test_id
+        LEFT JOIN groups ON link_tests_groups.group_id = groups.id
+        LEFT JOIN link_groups_questions ON groups.id = link_groups_questions.group_id
+        LEFT JOIN questions ON link_groups_questions.question_id = questions.id
     WHERE 
-        test.account_id = user_id
+        tests.account_id = user_id
     GROUP BY 
-        test.id_test, 
-        test.name, 
-        test.time;
+        tests.id, 
+        tests.name, 
+        tests.time;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectActivetedTests` (IN `account_id` INT)   BEGIN
+    SELECT activated_tests.id, tests.name, activated_tests.activation_time, tests.time, activated_tests.test_code
+    FROM activated_tests 
+    LEFT JOIN tests ON activated_tests.test_id = tests.id
+    WHERE activated_tests.account_id = account_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectQuestionGroups` (IN `p_user_id` INT)   BEGIN
+    SELECT groups.id, groups.name, COUNT(questions.id) AS question_count
+    FROM groups
+    LEFT JOIN link_groups_questions ON groups.id = link_groups_questions.group_id
+    LEFT JOIN questions ON link_groups_questions.question_id = questions.id
+    WHERE groups.account_id = p_user_id
+    GROUP BY groups.id, groups.name
+    ORDER BY groups.id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SelectQuestionGroupsForTest` (IN `p_user_id` INT, IN `p_test_id` INT)   BEGIN
+    SELECT groups.id, groups.name, COUNT(questions.id) AS question_count
+    FROM groups
+    LEFT JOIN link_groups_questions ON groups.id = link_groups_questions.group_id
+    LEFT JOIN questions ON link_groups_questions.question_id = questions.id
+    LEFT JOIN link_tests_groups ON groups.id = link_tests_groups.group_id
+    WHERE groups.account_id = p_user_id AND link_tests_groups.test_id = p_test_id
+    GROUP BY groups.id, groups.name
+    ORDER BY groups.id;
 END$$
 
 DELIMITER ;
@@ -68,7 +182,9 @@ CREATE TABLE `accounts` (
 
 INSERT INTO `accounts` (`account_id`, `Login`, `Password_hash`, `Salt`, `Type`) VALUES
 (1, 'artur.ograbek', '01829da8bc6c5d8365cb06b808f5675cdef9b17dbeafe9cd06ccc04a0f100c0e', 'a0e3b231687b3d0ff3901c52643216b4', 1),
-(2, 'Patryk.Orzechowski', '5c027691a1c8af0f69d769df91ccd9a11b4f0a6eb129d80b861e2232d2b2d198', 'b24db6b35f2d5ed7f6abb31871bd9efd', 2);
+(2, 'Patryk.Orzechowski', '5c027691a1c8af0f69d769df91ccd9a11b4f0a6eb129d80b861e2232d2b2d198', 'b24db6b35f2d5ed7f6abb31871bd9efd', 2),
+(8, 'aloizy.nowak', '6e716e830dbff9a1c5aa716c9b480cf6d30109977b63154e0ed94ad2d1397564', '0', 1),
+(11, 'Alicja.Kozlowska', 'e12f46d2ebd9ed53b881f050dade5c8b967decd4992cecfde19b7d1d604e085b', '7acd5a5e702500c2a300fc65d8acb175', 3);
 
 -- --------------------------------------------------------
 
@@ -89,15 +205,16 @@ CREATE TABLE `account_data` (
 --
 
 INSERT INTO `account_data` (`account_id`, `name`, `surname`, `number`, `email`) VALUES
-(2, 'Patryk', 'Orzechowski', NULL, 'patryk@cos.com');
+(2, 'Patryk', 'Orzechowski', NULL, 'patryk@cos.com'),
+(11, 'Alicja', 'Kozlowska', 0, 'alicja@cos.com');
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `activeted_test`
+-- Struktura tabeli dla tabeli `activated_tests`
 --
 
-CREATE TABLE `activeted_test` (
+CREATE TABLE `activated_tests` (
   `id` int(11) NOT NULL,
   `activation_time` datetime NOT NULL,
   `test_code` varchar(6) DEFAULT NULL,
@@ -107,19 +224,19 @@ CREATE TABLE `activeted_test` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `activeted_test`
+-- Dumping data for table `activated_tests`
 --
 
-INSERT INTO `activeted_test` (`id`, `activation_time`, `test_code`, `test_id`, `account_id`, `code_generated`) VALUES
-(4, '2024-05-25 04:39:00', 'SMJGHP', 4, 2, 1),
+INSERT INTO `activated_tests` (`id`, `activation_time`, `test_code`, `test_id`, `account_id`, `code_generated`) VALUES
 (5, '2024-05-25 02:41:00', NULL, 4, 2, 1),
-(6, '2024-05-25 02:56:00', NULL, 4, 2, 1);
+(6, '2024-05-25 02:56:00', NULL, 4, 2, 1),
+(7, '2024-05-29 00:40:00', NULL, 8, 2, 1);
 
 --
--- Wyzwalacze `activeted_test`
+-- Wyzwalacze `activated_tests`
 --
 DELIMITER $$
-CREATE TRIGGER `generate_test_code` BEFORE INSERT ON `activeted_test` FOR EACH ROW BEGIN
+CREATE TRIGGER `generate_test_code` BEFORE INSERT ON `activated_tests` FOR EACH ROW BEGIN
     DECLARE test_code_generated VARCHAR(6);
     DECLARE characters VARCHAR(36) DEFAULT 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     DECLARE i INT DEFAULT 1;
@@ -144,7 +261,7 @@ DELIMITER ;
 --
 
 CREATE TABLE `answers` (
-  `answer_id` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `text` text DEFAULT NULL,
   `correct` tinyint(1) DEFAULT NULL,
   `question_id` int(11) NOT NULL,
@@ -155,7 +272,7 @@ CREATE TABLE `answers` (
 -- Dumping data for table `answers`
 --
 
-INSERT INTO `answers` (`answer_id`, `text`, `correct`, `question_id`, `points`) VALUES
+INSERT INTO `answers` (`id`, `text`, `correct`, `question_id`, `points`) VALUES
 (17, 'Tak', 0, 2, NULL),
 (18, 'Nie', 0, 2, NULL),
 (80, 'Nie', 0, 1, NULL),
@@ -204,10 +321,10 @@ INSERT INTO `groups` (`id`, `name`, `account_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `link_account_activated_test`
+-- Struktura tabeli dla tabeli `link_account_activated_tests`
 --
 
-CREATE TABLE `link_account_activated_test` (
+CREATE TABLE `link_account_activated_tests` (
   `id` int(11) NOT NULL,
   `account_id` int(11) NOT NULL,
   `activated_test_id` int(11) NOT NULL,
@@ -217,20 +334,20 @@ CREATE TABLE `link_account_activated_test` (
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `link_account_activated_test_answer`
+-- Struktura tabeli dla tabeli `link_account_activated_tests_answer`
 --
 
-CREATE TABLE `link_account_activated_test_answer` (
+CREATE TABLE `link_account_activated_tests_answer` (
   `id` int(11) NOT NULL,
   `link_account_activated_test_id` int(11) NOT NULL,
   `answer_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Wyzwalacze `link_account_activated_test_answer`
+-- Wyzwalacze `link_account_activated_tests_answer`
 --
 DELIMITER $$
-CREATE TRIGGER `after_insert_link_account_activated_test_answer` AFTER INSERT ON `link_account_activated_test_answer` FOR EACH ROW BEGIN
+CREATE TRIGGER `after_insert_link_account_activated_test_answer` AFTER INSERT ON `link_account_activated_tests_answer` FOR EACH ROW BEGIN
   UPDATE link_account_activated_test laatt
   JOIN answers a ON NEW.answer_id = a.answer_id
   JOIN questions q ON a.question_id = q.id_question
@@ -243,20 +360,20 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `link_group_questions`
+-- Struktura tabeli dla tabeli `link_groups_questions`
 --
 
-CREATE TABLE `link_group_questions` (
+CREATE TABLE `link_groups_questions` (
   `id` int(11) NOT NULL,
   `question_id` int(11) NOT NULL,
   `group_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `link_group_questions`
+-- Dumping data for table `link_groups_questions`
 --
 
-INSERT INTO `link_group_questions` (`id`, `question_id`, `group_id`) VALUES
+INSERT INTO `link_groups_questions` (`id`, `question_id`, `group_id`) VALUES
 (38, 1, 15),
 (39, 1, 16);
 
@@ -277,16 +394,18 @@ CREATE TABLE `link_organisations_accounts` (
 --
 
 INSERT INTO `link_organisations_accounts` (`id`, `account_id`, `organisation_id`) VALUES
-(0, 2, 1),
-(1, 1, 1);
+(1, 2, 1),
+(2, 1, 1),
+(5, 8, 2),
+(6, 11, 1);
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `link_test_groups`
+-- Struktura tabeli dla tabeli `link_tests_groups`
 --
 
-CREATE TABLE `link_test_groups` (
+CREATE TABLE `link_tests_groups` (
   `id` int(11) NOT NULL,
   `test_id` int(11) NOT NULL,
   `group_id` int(11) NOT NULL,
@@ -294,12 +413,14 @@ CREATE TABLE `link_test_groups` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `link_test_groups`
+-- Dumping data for table `link_tests_groups`
 --
 
-INSERT INTO `link_test_groups` (`id`, `test_id`, `group_id`, `question_count`) VALUES
+INSERT INTO `link_tests_groups` (`id`, `test_id`, `group_id`, `question_count`) VALUES
 (5, 7, 15, 0),
-(6, 7, 16, 0);
+(6, 7, 16, 0),
+(7, 8, 15, 0),
+(8, 8, 16, 0);
 
 -- --------------------------------------------------------
 
@@ -308,7 +429,7 @@ INSERT INTO `link_test_groups` (`id`, `test_id`, `group_id`, `question_count`) V
 --
 
 CREATE TABLE `organisations` (
-  `organisation_id` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `Name` varchar(100) NOT NULL,
   `initials` varchar(4) NOT NULL,
   `Address` varchar(25) NOT NULL
@@ -318,8 +439,9 @@ CREATE TABLE `organisations` (
 -- Dumping data for table `organisations`
 --
 
-INSERT INTO `organisations` (`organisation_id`, `Name`, `initials`, `Address`) VALUES
-(1, 'Uniwersytet Łódzki', 'UL', 'Narutowicz 68');
+INSERT INTO `organisations` (`id`, `Name`, `initials`, `Address`) VALUES
+(1, 'Uniwersytet Łódzki', 'UL', 'Narutowicz 68'),
+(2, 'Uniwersytet Warszawski', 'UW', 'aa');
 
 -- --------------------------------------------------------
 
@@ -328,7 +450,7 @@ INSERT INTO `organisations` (`organisation_id`, `Name`, `initials`, `Address`) V
 --
 
 CREATE TABLE `questions` (
-  `id_question` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `opened` tinyint(1) NOT NULL,
   `text` text NOT NULL,
   `points` int(11) NOT NULL,
@@ -339,7 +461,7 @@ CREATE TABLE `questions` (
 -- Dumping data for table `questions`
 --
 
-INSERT INTO `questions` (`id_question`, `opened`, `text`, `points`, `account_id`) VALUES
+INSERT INTO `questions` (`id`, `opened`, `text`, `points`, `account_id`) VALUES
 (1, 0, 'Czy się udało?', 1000, 2),
 (2, 0, 'Czy się udało?', 1000, NULL);
 
@@ -358,27 +480,28 @@ CREATE TABLE `question_image` (
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `test`
+-- Struktura tabeli dla tabeli `tests`
 --
 
-CREATE TABLE `test` (
-  `id_test` int(11) NOT NULL,
+CREATE TABLE `tests` (
+  `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `time` int(11) NOT NULL,
   `account_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `test`
+-- Dumping data for table `tests`
 --
 
-INSERT INTO `test` (`id_test`, `name`, `time`, `account_id`) VALUES
+INSERT INTO `tests` (`id`, `name`, `time`, `account_id`) VALUES
 (1, 'Test', 10, NULL),
 (3, 'Test', 10, NULL),
 (4, 'Uniwersytet Łódzki', 1, 2),
 (5, 'Test', 10, NULL),
 (6, 'Test3', 10, NULL),
-(7, 'Test', 10, 2);
+(7, 'Test', 10, 2),
+(8, 'Test4', 1, 2);
 
 --
 -- Indeksy dla zrzutów tabel
@@ -399,9 +522,9 @@ ALTER TABLE `account_data`
   ADD UNIQUE KEY `number` (`number`);
 
 --
--- Indeksy dla tabeli `activeted_test`
+-- Indeksy dla tabeli `activated_tests`
 --
-ALTER TABLE `activeted_test`
+ALTER TABLE `activated_tests`
   ADD PRIMARY KEY (`id`),
   ADD KEY `test_id` (`test_id`),
   ADD KEY `account_id` (`account_id`);
@@ -410,7 +533,7 @@ ALTER TABLE `activeted_test`
 -- Indeksy dla tabeli `answers`
 --
 ALTER TABLE `answers`
-  ADD PRIMARY KEY (`answer_id`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `question_id` (`question_id`);
 
 --
@@ -421,25 +544,25 @@ ALTER TABLE `groups`
   ADD KEY `account_id` (`account_id`);
 
 --
--- Indeksy dla tabeli `link_account_activated_test`
+-- Indeksy dla tabeli `link_account_activated_tests`
 --
-ALTER TABLE `link_account_activated_test`
+ALTER TABLE `link_account_activated_tests`
   ADD PRIMARY KEY (`id`),
   ADD KEY `account_id` (`account_id`),
   ADD KEY `activated_test_id` (`activated_test_id`);
 
 --
--- Indeksy dla tabeli `link_account_activated_test_answer`
+-- Indeksy dla tabeli `link_account_activated_tests_answer`
 --
-ALTER TABLE `link_account_activated_test_answer`
+ALTER TABLE `link_account_activated_tests_answer`
   ADD PRIMARY KEY (`id`),
   ADD KEY `answer_id` (`answer_id`),
   ADD KEY `link_account_activated_test_id` (`link_account_activated_test_id`);
 
 --
--- Indeksy dla tabeli `link_group_questions`
+-- Indeksy dla tabeli `link_groups_questions`
 --
-ALTER TABLE `link_group_questions`
+ALTER TABLE `link_groups_questions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `group_id` (`group_id`),
   ADD KEY `question_id` (`question_id`);
@@ -453,9 +576,9 @@ ALTER TABLE `link_organisations_accounts`
   ADD KEY `school_id` (`organisation_id`);
 
 --
--- Indeksy dla tabeli `link_test_groups`
+-- Indeksy dla tabeli `link_tests_groups`
 --
-ALTER TABLE `link_test_groups`
+ALTER TABLE `link_tests_groups`
   ADD PRIMARY KEY (`id`),
   ADD KEY `test_id` (`test_id`),
   ADD KEY `link_test_question_ibfk_2` (`group_id`);
@@ -464,14 +587,14 @@ ALTER TABLE `link_test_groups`
 -- Indeksy dla tabeli `organisations`
 --
 ALTER TABLE `organisations`
-  ADD PRIMARY KEY (`organisation_id`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `initials` (`initials`);
 
 --
 -- Indeksy dla tabeli `questions`
 --
 ALTER TABLE `questions`
-  ADD PRIMARY KEY (`id_question`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `account_id` (`account_id`);
 
 --
@@ -483,10 +606,10 @@ ALTER TABLE `question_image`
   ADD KEY `question_id` (`question_id`);
 
 --
--- Indeksy dla tabeli `test`
+-- Indeksy dla tabeli `tests`
 --
-ALTER TABLE `test`
-  ADD PRIMARY KEY (`id_test`),
+ALTER TABLE `tests`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `account_id` (`account_id`),
   ADD KEY `name` (`name`) USING BTREE;
 
@@ -498,19 +621,19 @@ ALTER TABLE `test`
 -- AUTO_INCREMENT for table `accounts`
 --
 ALTER TABLE `accounts`
-  MODIFY `account_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `account_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
--- AUTO_INCREMENT for table `activeted_test`
+-- AUTO_INCREMENT for table `activated_tests`
 --
-ALTER TABLE `activeted_test`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+ALTER TABLE `activated_tests`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `answers`
 --
 ALTER TABLE `answers`
-  MODIFY `answer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT for table `groups`
@@ -519,40 +642,52 @@ ALTER TABLE `groups`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
--- AUTO_INCREMENT for table `link_account_activated_test`
+-- AUTO_INCREMENT for table `link_account_activated_tests`
 --
-ALTER TABLE `link_account_activated_test`
+ALTER TABLE `link_account_activated_tests`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `link_account_activated_test_answer`
+-- AUTO_INCREMENT for table `link_account_activated_tests_answer`
 --
-ALTER TABLE `link_account_activated_test_answer`
+ALTER TABLE `link_account_activated_tests_answer`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `link_group_questions`
+-- AUTO_INCREMENT for table `link_groups_questions`
 --
-ALTER TABLE `link_group_questions`
+ALTER TABLE `link_groups_questions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
--- AUTO_INCREMENT for table `link_test_groups`
+-- AUTO_INCREMENT for table `link_organisations_accounts`
 --
-ALTER TABLE `link_test_groups`
+ALTER TABLE `link_organisations_accounts`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `link_tests_groups`
+--
+ALTER TABLE `link_tests_groups`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `organisations`
+--
+ALTER TABLE `organisations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `questions`
 --
 ALTER TABLE `questions`
-  MODIFY `id_question` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT for table `test`
+-- AUTO_INCREMENT for table `tests`
 --
-ALTER TABLE `test`
-  MODIFY `id_test` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+ALTER TABLE `tests`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
@@ -565,17 +700,17 @@ ALTER TABLE `account_data`
   ADD CONSTRAINT `account_data_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`);
 
 --
--- Constraints for table `activeted_test`
+-- Constraints for table `activated_tests`
 --
-ALTER TABLE `activeted_test`
-  ADD CONSTRAINT `activeted_test_ibfk_1` FOREIGN KEY (`test_id`) REFERENCES `test` (`id_test`),
-  ADD CONSTRAINT `activeted_test_ibfk_2` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`);
+ALTER TABLE `activated_tests`
+  ADD CONSTRAINT `activated_tests_ibfk_1` FOREIGN KEY (`test_id`) REFERENCES `tests` (`id`),
+  ADD CONSTRAINT `activated_tests_ibfk_2` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`);
 
 --
 -- Constraints for table `answers`
 --
 ALTER TABLE `answers`
-  ADD CONSTRAINT `answers_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id_question`);
+  ADD CONSTRAINT `answers_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`);
 
 --
 -- Constraints for table `groups`
@@ -584,39 +719,39 @@ ALTER TABLE `groups`
   ADD CONSTRAINT `groups_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`);
 
 --
--- Constraints for table `link_account_activated_test`
+-- Constraints for table `link_account_activated_tests`
 --
-ALTER TABLE `link_account_activated_test`
-  ADD CONSTRAINT `link_account_activated_test_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`),
-  ADD CONSTRAINT `link_account_activated_test_ibfk_2` FOREIGN KEY (`activated_test_id`) REFERENCES `activeted_test` (`id`);
+ALTER TABLE `link_account_activated_tests`
+  ADD CONSTRAINT `link_account_activated_tests_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`),
+  ADD CONSTRAINT `link_account_activated_tests_ibfk_2` FOREIGN KEY (`activated_test_id`) REFERENCES `activated_tests` (`id`);
 
 --
--- Constraints for table `link_account_activated_test_answer`
+-- Constraints for table `link_account_activated_tests_answer`
 --
-ALTER TABLE `link_account_activated_test_answer`
-  ADD CONSTRAINT `link_account_activated_test_answer_ibfk_1` FOREIGN KEY (`answer_id`) REFERENCES `answers` (`answer_id`),
-  ADD CONSTRAINT `link_account_activated_test_answer_ibfk_2` FOREIGN KEY (`link_account_activated_test_id`) REFERENCES `link_account_activated_test` (`id`);
+ALTER TABLE `link_account_activated_tests_answer`
+  ADD CONSTRAINT `link_account_activated_tests_answer_ibfk_1` FOREIGN KEY (`answer_id`) REFERENCES `answers` (`id`),
+  ADD CONSTRAINT `link_account_activated_tests_answer_ibfk_2` FOREIGN KEY (`link_account_activated_test_id`) REFERENCES `link_account_activated_tests` (`id`);
 
 --
--- Constraints for table `link_group_questions`
+-- Constraints for table `link_groups_questions`
 --
-ALTER TABLE `link_group_questions`
-  ADD CONSTRAINT `link_group_questions_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`),
-  ADD CONSTRAINT `link_group_questions_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id_question`);
+ALTER TABLE `link_groups_questions`
+  ADD CONSTRAINT `link_groups_questions_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`),
+  ADD CONSTRAINT `link_groups_questions_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`);
 
 --
 -- Constraints for table `link_organisations_accounts`
 --
 ALTER TABLE `link_organisations_accounts`
   ADD CONSTRAINT `link_organisations_accounts_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`),
-  ADD CONSTRAINT `link_organisations_accounts_ibfk_2` FOREIGN KEY (`organisation_id`) REFERENCES `organisations` (`organisation_id`);
+  ADD CONSTRAINT `link_organisations_accounts_ibfk_2` FOREIGN KEY (`organisation_id`) REFERENCES `organisations` (`id`);
 
 --
--- Constraints for table `link_test_groups`
+-- Constraints for table `link_tests_groups`
 --
-ALTER TABLE `link_test_groups`
-  ADD CONSTRAINT `link_test_groups_ibfk_1` FOREIGN KEY (`test_id`) REFERENCES `test` (`id_test`),
-  ADD CONSTRAINT `link_test_groups_ibfk_2` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`);
+ALTER TABLE `link_tests_groups`
+  ADD CONSTRAINT `link_tests_groups_ibfk_1` FOREIGN KEY (`test_id`) REFERENCES `tests` (`id`),
+  ADD CONSTRAINT `link_tests_groups_ibfk_2` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`);
 
 --
 -- Constraints for table `questions`
@@ -628,20 +763,20 @@ ALTER TABLE `questions`
 -- Constraints for table `question_image`
 --
 ALTER TABLE `question_image`
-  ADD CONSTRAINT `question_image_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id_question`);
+  ADD CONSTRAINT `question_image_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `questions` (`id`);
 
 --
--- Constraints for table `test`
+-- Constraints for table `tests`
 --
-ALTER TABLE `test`
-  ADD CONSTRAINT `test_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`);
+ALTER TABLE `tests`
+  ADD CONSTRAINT `tests_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`account_id`);
 
 DELIMITER $$
 --
 -- Events
 --
-CREATE DEFINER=`root`@`localhost` EVENT `update_test_code_to_null` ON SCHEDULE EVERY 1 MINUTE STARTS '2024-05-25 02:54:55' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE activeted_test at
-  JOIN test t ON at.test_id = t.id_test
+CREATE DEFINER=`root`@`localhost` EVENT `update_test_code_to_null` ON SCHEDULE EVERY 1 MINUTE STARTS '2024-05-25 02:54:55' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE activated_tests at
+  JOIN tests t ON at.test_id = t.id
   SET at.test_code = NULL
   WHERE at.test_code IS NOT NULL
   AND at.activation_time <= DATE_SUB(NOW(), INTERVAL t.time MINUTE)$$

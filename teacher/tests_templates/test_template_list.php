@@ -18,14 +18,6 @@
         <?php
 
             // Zapytanie do bazy danych
-            /* $query = "SELECT test.id_test, test.name, test.time, COUNT(questions.id_question), SUM(questions.points)
-                FROM test LEFT JOIN link_test_groups ON test.id_test = link_test_groups.test_id
-                LEFT JOIN groups ON link_test_groups.group_id = groups.id
-                LEFT JOIN link_group_questions ON groups.id = link_group_questions.group_id
-                LEFT JOIN questions ON link_group_questions.question_id = questions.id_question
-                WHERE test.account_id = ".$_SESSION["user_id"]."
-                GROUP BY test.id_test, test.name, test.time;";
-            $result = $connection->query($query); */
             $sql = "CALL GetTestDetails(?)";
             $stmt = $connection->prepare($sql);
             $stmt->bind_param("i", $_SESSION["user_id"]);

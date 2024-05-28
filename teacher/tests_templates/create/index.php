@@ -16,7 +16,7 @@ $id = null;
 if(isset($_POST["template_id"])){
     $_SESSION["template_id"] = $_POST["template_id"];
     $id =  $_SESSION["template_id"];
-    $query = "SELECT name, time FROM test WHERE id_test = $id";
+    $query = "SELECT name, time FROM tests WHERE id = $id";
     $result = $connection->query($query);
     $row = mysqli_fetch_row($result);
     $name = $row[0];

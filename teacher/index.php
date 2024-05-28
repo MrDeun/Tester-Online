@@ -11,7 +11,8 @@ if($_SESSION["logged"] != 2){
 }
 clear_session_except(["logged","user_id"]);
 include('../login_sql.php');
-    
+$title = "PULPIT";
 $site_address = "dashboard.php";
+$create_check = getTesterOnlinePath() . "teacher/tests_activated/check/";
 
 include("../layout/layout.php");
