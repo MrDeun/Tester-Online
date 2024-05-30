@@ -25,7 +25,7 @@ if(isset($_POST["questions_count"])){
 }
 
 if($id == 0){
-    $query = "INSERT INTO `test` (`name`, `time`, `account_id`) VALUES ( ?, ?, ?)";
+    $query = "INSERT INTO `tests` (`name`, `time`, `account_id`) VALUES ( ?, ?, ?)";
     $stmt = $connection->prepare($query);
     $stmt->bind_param("sii", $name, $time, $_SESSION["user_id"]);
     $stmt->execute();
@@ -33,24 +33,24 @@ if($id == 0){
     $id = $stmt->insert_id;
 
     foreach ($groups as $key => $group) {
-        $query = "INSERT INTO `link_test_groups` (`id`, `test_id`, `group_id`, `question_count`) VALUES (NULL, ?, ?, ?)";
+        $query = "INSERT INTO `link_tests_groups` (`id`, `test_id`, `group_id`, `question_count`) VALUES (NULL, ?, ?, ?)";
         $stmt = $connection->prepare($query);
         $stmt->bind_param("iii", $id, $group, $questions_count[$key]);
         $stmt->execute();
     }
 }
 elseif($id >= 0){
-    $query = "UPDATE `test` SET `name` = ?, `time` = ? WHERE `id_test` = ?";
+    $query = "UPDATE `tests` SET `name` = ?, `time` = ? WHERE `id` = ?";
     $stmt = $connection->prepare($query);
     $stmt->bind_param("sii", $name, $time, $id);
     $stmt->execute();
     
-    $query = "DELETE FROM `link_test_groups` WHERE `test_id` = ?";
+    $query = "DELETE FROM `link_tests_groups` WHERE `test_id` = ?";
     $stmt = $connection->prepare($query);
     $stmt->bind_param("i", $id);
     $stmt->execute();
     foreach ($groups as $key => $group) {
-        $query = "INSERT INTO `link_test_groups` (`id`, `test_id`, `group_id`, `question_count`) VALUES (NULL, ?, ?, ?)";
+        $query = "INSERT INTO `link_tests_groups` (`id`, `test_id`, `group_id`, `question_count`) VALUES (NULL, ?, ?, ?)";
         $stmt = $connection->prepare($query);
         $stmt->bind_param("iii", $id, $group, $questions_count[$key]);
         $stmt->execute();

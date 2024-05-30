@@ -4,9 +4,9 @@
         <label for="test"><h3>Wybierz test do aktywacji</h3></label> 
         <select class="w3-select w3-margin-top w3-margin-bottom" name="test" required>
             <?php                    
-                $query = "SELECT `test`.`id_test`, `test`.`name`
-                FROM `test`
-                WHERE `test`.`account_id` = ".$_SESSION["user_id"].";";
+                $query = "SELECT `tests`.`id`, `tests`.`name`
+                FROM `tests`
+                WHERE `tests`.`account_id` = ".$_SESSION["user_id"].";";
                 $result = $connection->query($query); 
                 while ($row = mysqli_fetch_row($result)){                     
                     echo "<option value='".$row[0]."' id='".$row[0]."' name='".$row[1]."'>".$row[0].". ".$row[1]."</option>";

@@ -18,6 +18,4 @@
             break;
     }
 
-
     include("layout/layout.php"); 
-?>

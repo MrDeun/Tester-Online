@@ -17,7 +17,7 @@ if(isset($_POST["test"])){
 }
 
 if($id >= 0){
-    $query = "INSERT INTO `activeted_test` (`id`, `activation_time`, `test_id`, `account_id`) VALUES (NULL, ?, ?, ?)";
+    $query = "INSERT INTO `activated_tests` (`id`, `activation_time`, `test_id`, `account_id`) VALUES (NULL, ?, ?, ?)";
     $stmt = $connection->prepare($query);
     $stmt->bind_param("sii", $activation_time, $id, $_SESSION["user_id"]);
 
