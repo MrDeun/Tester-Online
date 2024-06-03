@@ -9,6 +9,10 @@ if(isset($_SESSION["logged"])){
         generateNav($testerOnlinePath."teacher/tests_activated","AKTYWOWANE TESTY");
         generateNav($testerOnlinePath."teacher/questions","PYTANIA");
     }
+    elseif($_SESSION["logged"] == '3'){
+        generateNav($testerOnlinePath."student","PULPIT");
+        generateNav($testerOnlinePath."teacher","TESTY");
+    }
 }
 else{
     generateNav($testerOnlinePath."/login","LOGIN","w3-right");

@@ -15,15 +15,13 @@
             <th style="width: 10%;">Sprawdź</th>
         </tr>
         <?php
+            // Reset kursora wyniku
+            mysqli_next_result($connection);
 
-            // Zapytanie do bazy danych
-            $query = "SELECT `activeted_test`.`id`, `test`.`name`, `activeted_test`.`activation_time`, `test`.`time`, `activeted_test`.`test_code`
-                FROM `activeted_test` 
-                LEFT JOIN `test` ON `activeted_test`.`test_id` = `test`.`id_test`
-                WHERE `activeted_test`.`account_id` = ".$_SESSION["user_id"].";";
+            $query = "CALL SelectActivetedTests(" . $_SESSION["user_id"] . ")";
             $result = $connection->query($query);
             $check = false;
-            //if ($result->num_rows > 0) {
+
             while($row = mysqli_fetch_row($result)){
                 $check = true;
                 // Wyświetlenie danych w tabeli
@@ -35,8 +33,8 @@
                     <td>".$row[4]."</td>
                     <td>
                         <form action='$create_check' method='post'>
-                            <input type='hidden'  name='template_id' value='".$row[0]."'>
-                            <button class='w3-button w3-blue'>Sprwawdź</button>
+                            <input type='hidden'  name='activated_id' value='".$row[0]."'>
+                            <button type='submit' class='w3-button w3-blue'>Sprawdź</button>
                         </form>
                     </td>
                 </tr>";
@@ -45,5 +43,6 @@
                 echo "<tr><td></td><td></td><td></td><td></td><td></td></tr>";
             }
         ?>
+
     </table>
 </div>

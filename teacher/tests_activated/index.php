@@ -12,12 +12,7 @@ if($_SESSION["logged"] != 2){
 clear_session_except(["logged","user_id"]);
 include('../../login_sql.php');
 
-//if(isset($_POST["deleteTemplate"])){
-//    $query = "DELETE FROM `link_test_groups` WHERE `test_id` = ".$_POST["template_id"].";";
-//    $connection->query($query);
-//    $query = "UPDATE `test` SET `account_id` = NULL WHERE `id_test` = ".$_POST["template_id"].";";
-//    $connection->query($query);
-//}
+
 $create_template = getTesterOnlinePath() . "teacher/tests_activated/create/";
 $create_check = getTesterOnlinePath() . "teacher/tests_activated/check/";
 $title = "AKTYWOWANE TESTY";

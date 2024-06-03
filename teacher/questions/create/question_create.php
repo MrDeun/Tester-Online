@@ -18,8 +18,8 @@
                         echo "<input type='hidden' name='question_id' value='$id'>";
                         $i = 0;
                         $query = "SELECT groups.id AS ID, groups.name AS Name 
-                            FROM groups LEFT JOIN link_group_questions ON groups.id = link_group_questions.group_id
-                            WHERE link_group_questions.question_id = $id
+                            FROM groups LEFT JOIN link_groups_questions ON groups.id = link_groups_questions.group_id
+                            WHERE link_groups_questions.question_id = $id
                             ORDER BY groups.id;";
                         $result = $connection->query($query);                   
                         while ($row = mysqli_fetch_row($result)){
@@ -71,7 +71,7 @@
                 <?php
                     if($id != null){
                         $i = 0;
-                        $query = "SELECT answers.answer_id, answers.text, answers.correct FROM answers WHERE answers.question_id = $id";
+                        $query = "SELECT answers.id, answers.text, answers.correct FROM answers WHERE answers.question_id = $id AND answers.deleted != 1";
                         $result = $connection->query($query);
                         while ($row = mysqli_fetch_row($result)){
                             $correct = "";
