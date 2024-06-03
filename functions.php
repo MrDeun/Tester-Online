@@ -41,7 +41,7 @@ function getTesterOnlinePath() {
         $testerOnlinePath = substr($Path, 0, $position + strlen("/Tester%20Online") - 1);
     } else {
         // Jeżeli nie znaleziono, to zwracamy całą ścieżkę
-        $testerOnlinePath = "/";
+        $testerOnlinePath = "localhost/";
     }
     return $testerOnlinePath;
 }

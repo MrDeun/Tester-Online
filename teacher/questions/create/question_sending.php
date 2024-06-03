@@ -2,6 +2,9 @@
     if (!$_SERVER['REQUEST_METHOD'] == 'POST') {
         redirectToIndex("/teacher/questions/create");
     }
+    if(session_status() == PHP_SESSION_NONE){
+        session_start();
+    }
     include('../../../login_sql.php');
     $id = 0;
     $text = "";
@@ -33,9 +36,9 @@
     
     if($id == 0){
         // Tworzenie nowego pytania
-        $query = "INSERT INTO `questions` (`opened`, `text`, `points`) VALUES ( ?, ?, ?)";
+        $query = "INSERT INTO `questions` (`opened`, `text`, `points`, `account_id`) VALUES ( ?, ?, ?, ?)";
         $stmt = $connection->prepare($query);
-        $stmt->bind_param("isi", $open, $text, $points);
+        $stmt->bind_param("isii", $open, $text, $points, $_SESSION["user_id"]);
         $stmt->execute();
         
         // Pobierz nowy ID pytania
@@ -43,7 +46,7 @@
         
         // Dodawanie grup do pytania
         foreach ($groups as $group) {
-            $query = "INSERT INTO `link_group_questions` (`id`, `question_id`, `group_id`) VALUES (NULL, ?, ?)";
+            $query = "INSERT INTO `link_groups_questions` (`id`, `question_id`, `group_id`) VALUES (NULL, ?, ?)";
             $stmt = $connection->prepare($query);
             $stmt->bind_param("ii", $id, $group);
             $stmt->execute();
@@ -53,7 +56,7 @@
             // Dodawanie odpowiedzi do pytania
             foreach ($_POST["answers"] as $key => $answer) {
                 $correct = in_array($key, $answers_correct) ? 1 : 0;
-                $query = "INSERT INTO `answers` (`answer_id`, `text`, `correct`, `question_id`) VALUES (NULL, ?, ?, ?)";
+                $query = "INSERT INTO `answers` (`id`, `text`, `correct`, `question_id`) VALUES (NULL, ?, ?, ?)";
                 $stmt = $connection->prepare($query);
                 $stmt->bind_param("sii", $answer, $correct, $id);
                 $stmt->execute();
@@ -62,19 +65,19 @@
     }
     elseif ($id >= 0) {
         // Aktualizacja istniejącego pytania
-        $query = "UPDATE `questions` SET `opened` = ?, `text` = ?, `points` = ? WHERE `id_question` = ?";
+        $query = "UPDATE `questions` SET `opened` = ?, `text` = ?, `points` = ? WHERE `id` = ?";
         $stmt = $connection->prepare($query);
         $stmt->bind_param("isii", $open, $text, $points, $id);
         $stmt->execute();
     
         // Aktualizacja grup do pytania - najpierw usuń stare, potem dodaj nowe
-        $query = "DELETE FROM `link_group_questions` WHERE `question_id` = ?";
+        $query = "DELETE FROM `link_groups_questions` WHERE `question_id` = ?";
         $stmt = $connection->prepare($query);
         $stmt->bind_param("i", $id);
         $stmt->execute();
     
         foreach ($groups as $group) {
-            $query = "INSERT INTO `link_group_questions` (`id`, `question_id`, `group_id`) VALUES (NULL, ?, ?)";
+            $query = "INSERT INTO `link_groups_questions` (`id`, `question_id`, `group_id`) VALUES (NULL, ?, ?)";
             $stmt = $connection->prepare($query);
             $stmt->bind_param("ii", $id, $group);
             $stmt->execute();
@@ -83,14 +86,14 @@
         // Aktualizacja odpowiedzi do pytania tylko, gdy $open jest fałszem
         if (!$open) {
             // Usuń wszystkie odpowiedzi jeśli $open jest fałszem
-            $query = "DELETE FROM `answers` WHERE `question_id` = ?";
+            $query = "UPDATE `answers` SET `deleted` = 1 WHERE `question_id` = ?";
             $stmt = $connection->prepare($query);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             // Dodawanie nowych odpowiedzi z formularza
             foreach ($_POST["answers"] as $key => $answer) {              
                 $correct = in_array($key + 1, $answers_correct) ? 1 : 0;
-                $query = "INSERT INTO `answers` (`answer_id`, `text`, `correct`, `question_id`) VALUES (NULL, ?, ?, ?)";
+                $query = "INSERT INTO `answers` (`id`, `text`, `correct`, `question_id`) VALUES (NULL, ?, ?, ?)";
                 $stmt = $connection->prepare($query);
                 $stmt->bind_param("sii", $answer, $correct, $id);
                 $stmt->execute();

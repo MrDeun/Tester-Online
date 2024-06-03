@@ -11,9 +11,9 @@
         <?php
             
             $check = false;
-            $query = "SELECT groups.id AS ID, groups.name AS Name, COUNT(questions.id_question) AS Questions 
-                FROM groups LEFT JOIN link_group_questions ON groups.id = link_group_questions.group_id
-                LEFT JOIN questions ON link_group_questions.question_id = questions.id_question 
+            $query = "SELECT groups.id AS ID, groups.name AS Name, COUNT(questions.id) AS Questions 
+                FROM groups LEFT JOIN link_groups_questions ON groups.id = link_groups_questions.group_id
+                LEFT JOIN questions ON link_groups_questions.question_id = questions.id 
                 WHERE groups.account_id = ".$_SESSION["user_id"]." 
                 GROUP BY groups.id, groups.name;";
             $result = $connection->query($query);
@@ -64,12 +64,12 @@
             <th style="width: 10%;">Usuń</th>
         </tr>
         <?php
-            $query = "SELECT questions.id_question, questions.text, questions.points FROM questions WHERE questions.account_id = ".$_SESSION["user_id"].";";
+            $query = "SELECT questions.id, questions.text, questions.points FROM questions WHERE questions.account_id = ".$_SESSION["user_id"].";";
             $result = $connection->query($query);
 
             while ($row = mysqli_fetch_row($result)){
                 $check = true;
-                $query2 = "SELECT group_id AS GroupID FROM link_group_questions WHERE question_id = ".$row[0].";";
+                $query2 = "SELECT group_id AS GroupID FROM link_groups_questions WHERE question_id = ".$row[0].";";
                 $result2 = mysqli_query($connection,$query2);
 
                 

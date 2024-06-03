@@ -18,7 +18,7 @@ $id = null;$text = "";$open = false;$points = 0;
 if(isset($_POST["question_id"])){
     $_SESSION["question_id"] = $_POST["question_id"];
     $id =  $_SESSION["question_id"];
-    $query = "SELECT text, opened, points FROM questions WHERE id_question = $id";
+    $query = "SELECT text, opened, points FROM questions WHERE id = $id";
     $result = $connection->query($query);
     $row = mysqli_fetch_row($result);
     $text = $row[0];
