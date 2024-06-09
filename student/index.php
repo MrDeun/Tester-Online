@@ -13,5 +13,6 @@ clear_session_except(["logged","user_id"]);
 include('../login_sql.php');
 $title = "PULPIT";
 $site_address = "dashboard.php";
+$test_address = getTesterOnlinePath() . "student/test/";
 
 include("../layout/layout.php");
