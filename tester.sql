@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Cze 03, 2024 at 01:59 AM
+-- Generation Time: Cze 09, 2024 at 08:49 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -70,6 +70,99 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `AddNewAccount` (IN `p_login` VARCHA
     -- Dodanie relacji między kontem a organizacją do tabeli link_organisations_accounts
     INSERT INTO link_organisations_accounts (account_id, organisation_id)
     VALUES (@last_account_id, @organisation_id);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AssignTestToStudent` (IN `p_activated_test_id` INT, IN `p_student_id` INT)   BEGIN
+    DECLARE v_test_id INT;
+    DECLARE v_group_id INT;
+    DECLARE v_question_count INT;
+    DECLARE v_question_id INT;
+    DECLARE v_link_account_activated_test_id INT;
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE record_exists INT DEFAULT 0;
+
+    -- Deklaracja kursora dla grup
+    DECLARE v_groups CURSOR FOR 
+        SELECT group_id, question_count 
+        FROM link_tests_groups 
+        WHERE test_id = v_test_id;
+
+    -- Deklaracja kursora dla pytań
+    DECLARE question_cursor CURSOR FOR 
+        SELECT question_id 
+        FROM link_groups_questions 
+        WHERE group_id = v_group_id 
+        LIMIT v_question_count;
+
+    -- Deklaracja warunku końca kursora
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- Tymczasowa tabela do przechowywania wyników
+    CREATE TEMPORARY TABLE IF NOT EXISTS temp_questions (
+        question_id INT
+    );
+    
+    -- Przypisanie wartości do v_test_id
+    SELECT test_id INTO v_test_id 
+    FROM activated_tests 
+    WHERE id = p_activated_test_id;
+
+	-- Sprawdzenie, czy istnieje już wiersz
+    SELECT COUNT(*) INTO record_exists
+    FROM link_account_activated_tests
+    WHERE account_id = p_student_id AND activated_test_id = p_activated_test_id;
+
+    -- Wstawienie wiersza, jeśli nie istnieje
+    IF record_exists = 0 THEN
+        INSERT INTO link_account_activated_tests (account_id, activated_test_id) 
+        VALUES (p_student_id, p_activated_test_id);
+    END IF;
+
+    -- Pobranie ID z tabeli link_account_activated_tests
+    SELECT id INTO v_link_account_activated_test_id
+    FROM link_account_activated_tests
+    WHERE account_id = p_student_id AND activated_test_id = p_activated_test_id;
+
+    -- Otwarcie kursora dla grup
+    OPEN v_groups;
+
+    -- Pętla po v_groups
+    read_loop: LOOP
+        FETCH v_groups INTO v_group_id, v_question_count;
+        IF done THEN
+            SET done = FALSE;
+            LEAVE read_loop;
+        END IF;
+
+        -- Otwarcie kursora dla pytań
+        OPEN question_cursor;
+
+        -- Pętla po pytaniach
+        question_loop: LOOP
+            FETCH question_cursor INTO v_question_id;
+            IF done THEN
+                SET done = FALSE;
+                LEAVE question_loop;
+            END IF;
+
+            -- Wstawienie do tymczasowej tabeli
+            INSERT INTO temp_questions (question_id) 
+            VALUES (v_question_id);
+        END LOOP question_loop;
+
+        -- Zamknięcie kursora dla pytań
+        CLOSE question_cursor;
+    END LOOP read_loop;
+
+    -- Zamknięcie kursora dla grup
+    CLOSE v_groups;
+
+
+    -- Zwrócenie wyników
+    SELECT * FROM temp_questions;
+
+    -- Usunięcie tymczasowej tabeli
+    DROP TEMPORARY TABLE temp_questions;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `ChangePassword` (IN `p_id` INT, IN `p_password_hash` VARCHAR(255), IN `p_salt` VARCHAR(32))   BEGIN
@@ -140,10 +233,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRecentlyActivatedTests` (IN `use
     FROM activated_tests
     JOIN tests ON activated_tests.test_id = tests.id
     LEFT JOIN link_account_activated_tests ON activated_tests.id = link_account_activated_tests.activated_test_id
-    WHERE tests.id NOT IN (
+   WHERE tests.id IN (
         SELECT tests.id
         FROM tests
-        WHERE tests.account_id <> user_id
+        WHERE tests.account_id = user_id
     )
     GROUP BY activated_tests.id, tests.name, activated_tests.activation_time
     ORDER BY activated_tests.activation_time DESC
@@ -317,7 +410,8 @@ INSERT INTO `activated_tests` (`id`, `activation_time`, `test_code`, `test_id`, 
 (7, '2024-05-29 00:40:00', NULL, 8, 2, 1),
 (8, '2024-06-01 10:00:00', NULL, 4, 2, 1),
 (9, '2024-06-01 11:00:00', NULL, 5, 8, 1),
-(10, '2024-06-01 12:00:00', NULL, 6, 11, 1);
+(10, '2024-06-01 12:00:00', NULL, 6, 11, 1),
+(11, '2024-06-09 18:08:00', 'M3AXHE', 7, 2, 1);
 
 --
 -- Wyzwalacze `activated_tests`
@@ -415,7 +509,7 @@ INSERT INTO `link_account_activated_tests` (`id`, `account_id`, `activated_test_
 (1, 11, 5, 0, 0),
 (2, 2, 7, 1000, 0),
 (3, 8, 5, 20, 1),
-(4, 11, 10, 25, 0);
+(13, 11, 11, 1000, 0);
 
 -- --------------------------------------------------------
 
@@ -440,7 +534,8 @@ INSERT INTO `link_account_activated_tests_answer` (`id`, `link_account_activated
 (1, 2, 17, 0, 2, 0),
 (3, 2, 18, 0, 2, 0),
 (4, 2, 81, 0, 1, 0),
-(13, 2, 81, 0, 1, 0);
+(13, 2, 81, 0, 1, 0),
+(19, 13, 81, 0, 1, 0);
 
 --
 -- Wyzwalacze `link_account_activated_tests_answer`
@@ -560,8 +655,8 @@ CREATE TABLE `link_tests_groups` (
 --
 
 INSERT INTO `link_tests_groups` (`id`, `test_id`, `group_id`, `question_count`) VALUES
-(5, 7, 15, 0),
-(6, 7, 16, 0),
+(5, 7, 15, 1),
+(6, 7, 16, 1),
 (7, 8, 15, 0),
 (8, 8, 16, 0),
 (9, 4, 20, 5),
@@ -787,7 +882,7 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT for table `activated_tests`
 --
 ALTER TABLE `activated_tests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `answers`
@@ -805,13 +900,13 @@ ALTER TABLE `groups`
 -- AUTO_INCREMENT for table `link_account_activated_tests`
 --
 ALTER TABLE `link_account_activated_tests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `link_account_activated_tests_answer`
 --
 ALTER TABLE `link_account_activated_tests_answer`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `link_groups_questions`
