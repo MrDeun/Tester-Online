@@ -53,7 +53,7 @@
                 <input type="checkbox" name="openCheck" id="openCheck" class="w3-check" value="open" onchange="openQuestionToggle('closeQuestion','openQuestion', 'openCheck');" <?php if($open)echo "checked"; ?>>       
             </h3>
         </div>
-        <div id="closeQuestion"  class="w3-margin-top w3-show">
+        <div id="closeQuestion"  class="w3-margin-top <?php if($open)echo "w3-hide"; else echo "w3-show"?>">
             <h3>
                 <label for="points">Liczba punktów za pytanie: </label>
                 <input type="number" name="points" id="points" min="0" max="1000" maxlength="4" <?php if($points != 0){echo "value='$points'";}else {echo "value='0'";} ?>>
