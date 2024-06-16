@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Cze 09, 2024 at 08:49 PM
+-- Generation Time: Cze 16, 2024 at 09:02 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -192,7 +192,9 @@ END$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetActivatedTestAnswer` (IN `p_question_id` INT, IN `p_link_account_activated_test_id` INT)   BEGIN
     SELECT 
         answers.text AS answer_text, 
-        answers.correct
+        answers.correct,
+       	link_account_activated_tests_answer.answer_id,
+        link_account_activated_tests_answer.points
     FROM 
         link_account_activated_tests_answer 
         LEFT JOIN answers ON link_account_activated_tests_answer.answer_id = answers.id 
@@ -225,7 +227,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `GetAnswerDetails` (IN `p_question_i
     FROM 
         answers 
     WHERE 
-        answers.question_id = p_question_id;
+        answers.question_id = p_question_id
+        AND answers.deleted != 1;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `GetRecentlyActivatedTests` (IN `user_id` INT)   BEGIN
@@ -411,7 +414,10 @@ INSERT INTO `activated_tests` (`id`, `activation_time`, `test_code`, `test_id`, 
 (8, '2024-06-01 10:00:00', NULL, 4, 2, 1),
 (9, '2024-06-01 11:00:00', NULL, 5, 8, 1),
 (10, '2024-06-01 12:00:00', NULL, 6, 11, 1),
-(11, '2024-06-09 18:08:00', 'M3AXHE', 7, 2, 1);
+(11, '2024-06-09 18:08:00', 'M3AXHE', 7, 2, 1),
+(12, '2024-06-16 19:47:00', 'GZA8ZX', 4, 2, 1),
+(13, '2024-06-16 19:48:00', 'IT6789', 8, 2, 1),
+(14, '2024-06-16 19:48:00', 'C1VYXI', 7, 2, 1);
 
 --
 -- Wyzwalacze `activated_tests`
@@ -456,9 +462,12 @@ CREATE TABLE `answers` (
 INSERT INTO `answers` (`id`, `text`, `correct`, `question_id`, `deleted`) VALUES
 (17, 'Tak', 0, 2, 0),
 (18, 'Nie', 0, 2, 0),
-(80, 'Nie', 0, 1, 0),
-(81, 'Super', 1, 1, 0),
-(82, 'odpowiedź otwarta', NULL, 13, 0);
+(80, 'Nie', 0, 1, 1),
+(81, 'Super', 1, 1, 1),
+(82, 'odpowiedź otwarta', NULL, 13, 0),
+(83, 'Nie', 0, 1, 0),
+(84, 'Super', 1, 1, 0),
+(85, 'Próba odpowiedzi otwartej', NULL, 13, 0);
 
 -- --------------------------------------------------------
 
@@ -509,7 +518,8 @@ INSERT INTO `link_account_activated_tests` (`id`, `account_id`, `activated_test_
 (1, 11, 5, 0, 0),
 (2, 2, 7, 1000, 0),
 (3, 8, 5, 20, 1),
-(13, 11, 11, 1000, 0);
+(13, 11, 11, 1000, 0),
+(21, 11, 14, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -535,7 +545,10 @@ INSERT INTO `link_account_activated_tests_answer` (`id`, `link_account_activated
 (3, 2, 18, 0, 2, 0),
 (4, 2, 81, 0, 1, 0),
 (13, 2, 81, 0, 1, 0),
-(19, 13, 81, 0, 1, 0);
+(19, 13, 81, 0, 1, 0),
+(20, 13, 80, 0, 1, 0),
+(21, 21, 85, 0, 13, 1),
+(22, 21, 83, 0, 1, 0);
 
 --
 -- Wyzwalacze `link_account_activated_tests_answer`
@@ -606,11 +619,11 @@ CREATE TABLE `link_groups_questions` (
 --
 
 INSERT INTO `link_groups_questions` (`id`, `question_id`, `group_id`) VALUES
-(38, 1, 15),
-(39, 1, 16),
-(40, 1, 20),
 (41, 2, 21),
-(42, 1, 22);
+(44, 13, 15),
+(45, 1, 16),
+(46, 1, 20),
+(47, 1, 22);
 
 -- --------------------------------------------------------
 
@@ -882,13 +895,13 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT for table `activated_tests`
 --
 ALTER TABLE `activated_tests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `answers`
 --
 ALTER TABLE `answers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
 
 --
 -- AUTO_INCREMENT for table `groups`
@@ -900,19 +913,19 @@ ALTER TABLE `groups`
 -- AUTO_INCREMENT for table `link_account_activated_tests`
 --
 ALTER TABLE `link_account_activated_tests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `link_account_activated_tests_answer`
 --
 ALTER TABLE `link_account_activated_tests_answer`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `link_groups_questions`
 --
 ALTER TABLE `link_groups_questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `link_organisations_accounts`

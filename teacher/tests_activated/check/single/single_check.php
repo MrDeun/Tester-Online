@@ -33,12 +33,13 @@ while ($row = mysqli_fetch_row($result)) {
     while ($row2 = mysqli_fetch_row($result2)) {
         $answers[] = [
             'answer_chosen_text' => $row2[0],
-            'correct' => $row2[1]
+            'correct' => $row2[1],
+            'id' => $row2[2],
+            'points' => $row2[3]
         ];
         
     }
     $stmt2->close(); // Zamknięcie wewnętrznego statementu
-
 
     // Uruchom procedurę GetAnswerDetails
     mysqli_next_result($connection);
@@ -50,38 +51,62 @@ while ($row = mysqli_fetch_row($result)) {
 
     while ($row3 = mysqli_fetch_row($result3)) {
         // Iteracja przez wszystkie odpowiedzi w tablicy $answers
-        echo "<p class='"; 
+        echo "<p>"; 
         foreach ($answers as $answer) {
-            if($question_open == 1){
-                break;
-            }
             $answer_chosen_text = $answer['answer_chosen_text'];
-            $correct = $answer['correct'];
-
-            // Przetwórz wynik procedury GetAnswerDetails
+            if($question_open == 1){
+                if($answer_chosen_text == $row3[0]){
+                    $answer_id = $answer['id'];
+                    if($answer['points'] != NULL)$points = $answer['points'];
+                    else $points = 0;
+                    echo "<p><textarea readonly>".$row3[0]."</textarea></p>";
+                    echo "<label for='points'>Punkty: </label>";
+                    echo "<form method='post'>
+                            <input type='number' name='points' id='points' class='w3-input' value='$points'>
+                            <input type='hidden' name='answer_id' value='$answer_id'>
+                            <button type='submit'>Zapisz</button>
+                        </form>";
+                    break;
             
-            if ($answer_chosen_text == $row3[0]) {
-                if ($correct == 1) {
-                    echo "w3-green";
-                    break;
-                } else {
-                    echo "w3-red";
-                    break;
                 }
+            }
+            else{
+                
+                $correct = $answer['correct'];
+
+                // Przetwórz wynik procedury GetAnswerDetails
+                echo "<p class='";
+                if ($answer_chosen_text == $row3[0]) {
+                    if ($correct == 1) {
+                        echo "w3-green";
+                        //break;
+                    } else {
+                        echo "w3-red";
+                        //break;
+                    }
+                }
+                echo "'>";
+                echo $row3[0];
+                echo "</p>";
             }
             
         }
-        echo "'>";
-        echo $row3[0];
+        
         echo "</p>";
     }
     $stmt3->close(); // Zamknięcie wewnętrznego statementu
     echo "</div>";
 
     
-    
-
-
-    
 }
 
+if (isset($_POST['answer_id']) && isset($_POST['points'])) {
+    $answer_id = $_POST['answer_id'];
+    $points = $_POST['points'];
+
+    $query = "UPDATE link_account_activated_tests_answer SET points = ? WHERE answer_id = ?";
+
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param("ii", $points, $answer_id);
+    $stmt->execute();
+}
