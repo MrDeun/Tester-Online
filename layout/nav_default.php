@@ -11,7 +11,7 @@ if(isset($_SESSION["logged"])){
     }
     elseif($_SESSION["logged"] == '3'){
         generateNav($testerOnlinePath."student","PULPIT");
-        generateNav($testerOnlinePath."teacher","TESTY");
+        generateNav($testerOnlinePath."student/tests_list","TESTY");
     }
 }
 else{
