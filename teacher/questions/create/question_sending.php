@@ -12,8 +12,9 @@
     $open = false;
     $points = 0;
     $answers;
-    $answers_correct;
+    $answers_correct = null;
     $answers_id;
+    $answers_text;
     
     // Pobierz dane z formularza POST
     if(isset($_POST["question_id"])){
@@ -29,9 +30,14 @@
     }
     if (isset($_POST["answers_correct"]) && is_array($_POST["answers_correct"])) {
         $answers_correct = $_POST["answers_correct"];
+        echo "OK";
     }
     if (isset($_POST["answer_id"]) && is_array($_POST["answer_id"])) {
         $answers_id = $_POST["answer_id"];
+    }
+    if (isset($_POST["answers_text"]) && is_array($_POST["answers_text"])) {
+        $answers_text = $_POST["answers_text"];
+        
     }
     
     if($id == 0){
@@ -91,8 +97,13 @@
             $stmt->bind_param("i", $id);
             $stmt->execute();
             // Dodawanie nowych odpowiedzi z formularza
-            foreach ($_POST["answers"] as $key => $answer) {              
-                $correct = in_array($key + 1, $answers_correct) ? 1 : 0;
+            foreach ($answers_text as $key => $answer) {              
+                if($answers_correct != null){
+                    $correct = in_array($key + 1, $answers_correct) ? 1 : 0;
+                }
+                else{
+                    $correct = 0;
+                }
                 $query = "INSERT INTO `answers` (`id`, `text`, `correct`, `question_id`) VALUES (NULL, ?, ?, ?)";
                 $stmt = $connection->prepare($query);
                 $stmt->bind_param("sii", $answer, $correct, $id);

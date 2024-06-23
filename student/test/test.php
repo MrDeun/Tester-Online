@@ -94,7 +94,7 @@ else{
                 echo "<textarea name='answers[]' class='w3-input'></textarea>";
             }
             else{
-                $query2 = "SELECT id, text FROM answers WHERE question_id = ? AND deleted != 1";
+                $query2 = "SELECT id, text FROM answers WHERE question_id = ? AND deleted = 0";
                 $stmt2 = $connection->prepare($query2);
                 $stmt2->bind_param("i",$question_id);
                 $stmt2->execute();
@@ -102,7 +102,7 @@ else{
                 while($row2 = mysqli_fetch_row($result2)){
                     $answer_id = $row2[0];
                     $answer_text = $row2[1];
-                    echo "<p><input type='checkbox' class='w3-input' name='answers[]' value='$answer_id'>$answer_text</p>"; 
+                    echo "<p>$answer_text <input type='checkbox' class='w3-check' name='answers[]' value='$answer_id'></p>"; 
                 }
             }
             

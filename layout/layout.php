@@ -46,7 +46,7 @@
 </head>
 <body class="w3-row w3-block" onresize="mainSizeChange()" onload="mainSizeChange()">
     <header class="w3-container w3-center w3-text-white">
-        <a href="<?php echo($_SERVER['PHP_SELF']); ?>" ><h1 class="header_h1 w3-jumbo w3-container">TESTER ONLINE</h1></a>
+        <a href="<?php echo getTesterOnlinePath(); ?>" ><h1 class="header_h1 w3-jumbo w3-container">TESTER ONLINE</h1></a>
     </header>
     <nav class="w3-container w3-text-black">
         <?php include("nav_default.php");?>
