@@ -17,5 +17,5 @@
             $logged = false;
             break;
     }
-
+    include('functions.php');
     include("layout/layout.php"); 
