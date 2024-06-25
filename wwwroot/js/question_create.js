@@ -39,7 +39,7 @@ function addAnswerRow(table_id, input_id){
             var correct = row.insertCell();
             var deleteRow = row.insertCell();
             id.innerHTML = "";
-            text.innerHTML = "<td><input type='text' class='w3-input' name='answers_text[]' value='" + input.value + "' readonly></td>";
+            text.innerHTML = "<td><input type='hidden' name='answers_text[]' value='" + input.value + "' > " + input.value + "</td>";
             correct.innerHTML = "<td><input type='checkbox' class='w3-check' name='answers_correct[]' value='" + row.sectionRowIndex + "'></td>";
             deleteRow.innerHTML = "<button type='button' class='w3-button w3-red' onclick='deleteTableRow(this)'>Usuń</button>";
         }

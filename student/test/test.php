@@ -91,7 +91,7 @@ else{
             echo "<input type='hidden' name='question_open[]' value='$open'>";
             echo "<input type='hidden' name='question_id[]' value='$question_id'>";
             if($open == 1){
-                echo "<textarea name='answers[]' class='w3-input'></textarea>";
+                echo "<textarea name='answer_".$i."[]' class='w3-input'></textarea>";
             }
             else{
                 $query2 = "SELECT id, text FROM answers WHERE question_id = ? AND deleted = 0";
@@ -102,7 +102,7 @@ else{
                 while($row2 = mysqli_fetch_row($result2)){
                     $answer_id = $row2[0];
                     $answer_text = $row2[1];
-                    echo "<p>$answer_text <input type='checkbox' class='w3-check' name='answers[]' value='$answer_id'></p>"; 
+                    echo "<p>$answer_text <input type='checkbox' class='w3-check' name='answer_".$i."[]' value='$answer_id'></p>"; 
                 }
             }
             

@@ -60,8 +60,13 @@
         
         if(!$open){
             // Dodawanie odpowiedzi do pytania
-            foreach ($_POST["answers"] as $key => $answer) {
-                $correct = in_array($key, $answers_correct) ? 1 : 0;
+            foreach ($answers_text as $key => $answer) {              
+                if($answers_correct != null){
+                    $correct = in_array($key + 1, $answers_correct) ? 1 : 0;
+                }
+                else{
+                    $correct = 0;
+                }
                 $query = "INSERT INTO `answers` (`id`, `text`, `correct`, `question_id`) VALUES (NULL, ?, ?, ?)";
                 $stmt = $connection->prepare($query);
                 $stmt->bind_param("sii", $answer, $correct, $id);
