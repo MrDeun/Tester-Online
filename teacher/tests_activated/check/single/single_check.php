@@ -10,11 +10,11 @@ mysqli_next_result($connection);
 $query = "CALL GetActivatedTestQuestions(?)";
 $stmt = $connection->prepare($query);
 $stmt->bind_param("i", $student_test_id);
+echo $student_test_id;
 $stmt->execute();
 $result = $stmt->get_result();
 $i = 0;
 while ($row = mysqli_fetch_row($result)) {
-    
     $question_text = $row[0];
     $question_id = $row[1];
     $question_open = $row[2];

@@ -81,7 +81,7 @@
                             $i++;
                             echo "<tr>
                                 <td>".$row[0]."</td>
-                                <td><input type='hidden' name='answers[]' id='answer_$i' value='".$row[1]."'>".$row[1]."</td>
+                                <td><input type='hidden' name='answers_text[]' id='answers_text[]' value='".$row[1]."'>".$row[1]."</td>
                                 <td>
                                     
                                     <input type='checkbox' class='w3-check' name='answers_correct[]' value='".$i."' $correct>
