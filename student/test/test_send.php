@@ -64,7 +64,7 @@ for ($i=0; $i < $size_of_arrays; $i++) {
     }
     else{
         
-        foreach ($answers[$i+1] as $answer) {
+        foreach ($answers[$i] as $answer) {
             $answer_id = $answer;
             $query = "INSERT INTO `link_account_activated_tests_answer` (`link_account_activated_test_id`, `answer_id`, `question_id`) 
                 VALUES (?, ?, ?)";

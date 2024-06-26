@@ -48,10 +48,9 @@ while ($row = mysqli_fetch_row($result)) {
     $stmt3->bind_param("i", $question_id);
     $stmt3->execute();
     $result3 = $stmt3->get_result();
-
     while ($row3 = mysqli_fetch_row($result3)) {
+        $x = false; $y = false;
         // Iteracja przez wszystkie odpowiedzi w tablicy $answers
-        echo "<p>"; 
         foreach ($answers as $answer) {
             $answer_chosen_text = $answer['answer_chosen_text'];
             if($question_open == 1){
@@ -71,28 +70,37 @@ while ($row = mysqli_fetch_row($result)) {
                 }
             }
             else{
-                
-                $correct = $answer['correct'];
 
+                $correct = $answer['correct'];
                 // Przetwórz wynik procedury GetAnswerDetails
-                echo "<p class='";
+                
                 if ($answer_chosen_text == $row3[0]) {
+                    $y = true;
                     if ($correct == 1) {
-                        echo "w3-green";
-                        //break;
-                    } else {
-                        echo "w3-red";
-                        //break;
+                        $x = true;
+                        break;
                     }
                 }
-                echo "'>";
-                echo $row3[0];
-                echo "</p>";
+                
             }
             
         }
-        
-        echo "</p>";
+        if($question_open == 0){
+            echo "<p ";
+            if($y){
+                echo "class='";
+                if($x){
+                    echo "w3-green";
+                }
+                else{
+                    echo "w3-red";
+                }
+                echo "'";
+            }
+            echo ">";
+            echo $row3[0];
+            echo "</p>";
+        }
     }
     $stmt3->close(); // Zamknięcie wewnętrznego statementu
     echo "</div>";
