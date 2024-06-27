@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Cze 16, 2024 at 09:02 PM
+-- Generation Time: Cze 27, 2024 at 10:43 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -414,10 +414,17 @@ INSERT INTO `activated_tests` (`id`, `activation_time`, `test_code`, `test_id`, 
 (8, '2024-06-01 10:00:00', NULL, 4, 2, 1),
 (9, '2024-06-01 11:00:00', NULL, 5, 8, 1),
 (10, '2024-06-01 12:00:00', NULL, 6, 11, 1),
-(11, '2024-06-09 18:08:00', 'M3AXHE', 7, 2, 1),
-(12, '2024-06-16 19:47:00', 'GZA8ZX', 4, 2, 1),
-(13, '2024-06-16 19:48:00', 'IT6789', 8, 2, 1),
-(14, '2024-06-16 19:48:00', 'C1VYXI', 7, 2, 1);
+(11, '2024-06-09 18:08:00', NULL, 7, 2, 1),
+(12, '2024-06-16 19:47:00', NULL, 4, 2, 1),
+(13, '2024-06-16 19:48:00', NULL, 8, 2, 1),
+(14, '2024-06-16 19:48:00', NULL, 7, 2, 1),
+(15, '2024-06-26 14:05:00', NULL, 9, 2, 1),
+(16, '2024-06-26 14:09:00', NULL, 10, 2, 1),
+(17, '2024-06-27 21:52:00', 'QLF563', 9, 2, 1),
+(18, '2024-06-27 22:22:00', 'SBWCQB', 11, 2, 1),
+(19, '2024-06-27 22:22:00', 'DSJ1B6', 12, 2, 1),
+(20, '2024-06-27 22:27:00', 'RHWPJC', 12, 2, 1),
+(21, '2024-06-27 22:29:00', 'WRTL6U', 9, 2, 1);
 
 --
 -- Wyzwalacze `activated_tests`
@@ -467,7 +474,127 @@ INSERT INTO `answers` (`id`, `text`, `correct`, `question_id`, `deleted`) VALUES
 (82, 'odpowiedź otwarta', NULL, 13, 0),
 (83, 'Nie', 0, 1, 0),
 (84, 'Super', 1, 1, 0),
-(85, 'Próba odpowiedzi otwartej', NULL, 13, 0);
+(85, 'Próba odpowiedzi otwartej', NULL, 13, 0),
+(86, 'wschodniej Afryki', 1, 14, 1),
+(87, 'północnej Europy', 0, 14, 1),
+(88, 'południowo-wschodniej Azji', 0, 14, 1),
+(89, 'wschodniej Afryki', 1, 14, 0),
+(90, 'północnej Europy', 0, 14, 0),
+(91, 'południowo-wschodniej Azji', 0, 14, 0),
+(92, 'koczowniczy tryb życia', 0, 15, 1),
+(93, 'podstawą utrzymania było zbieractwo', 0, 15, 1),
+(94, 'osiadły tryb życia', 1, 15, 1),
+(95, 'uprawa zbóż', 1, 15, 1),
+(96, 'koczowniczy tryb życia', 0, 15, 0),
+(97, 'podstawą utrzymania było zbieractwo', 0, 15, 0),
+(98, 'osiadły tryb życia', 1, 15, 0),
+(99, 'uprawa zbóż', 1, 15, 0),
+(100, 'homo erectus ', 0, 17, 0),
+(101, 'homo sapiens', 1, 17, 0),
+(102, 'homo habilis', 0, 17, 0),
+(103, 'epoka żelaza', 0, 19, 0),
+(104, 'epoka kamienia', 1, 19, 0),
+(105, 'epoka brązu', 0, 19, 0),
+(106, 'Prawda', 0, 20, 0),
+(107, 'Fałsz', 1, 20, 0),
+(108, 'Prawda', 1, 21, 0),
+(109, 'Fałsz', 0, 21, 0),
+(110, 'Prawda', 1, 22, 0),
+(111, 'Fałsz', 0, 22, 0),
+(112, 'posługiwanie się kamiennymi pięściakami', 1, 24, 0),
+(113, 'Wynalezienie łuku', 0, 24, 0),
+(114, 'posługiwanie się ogniem', 1, 24, 0),
+(115, 'budowa kamiennych domów', 0, 24, 0),
+(116, 'uprawa zbóż', 0, 25, 0),
+(117, 'hodowla zwierząt', 0, 25, 0),
+(118, 'łowiectwo', 1, 25, 0),
+(119, 'zbieractwo', 1, 25, 0),
+(120, 'Prawda', 0, 26, 0),
+(121, 'Fałsz', 1, 26, 0),
+(122, 'czcili siły natury', 0, 27, 0),
+(123, 'budowali stałe osady', 0, 27, 0),
+(124, 'przemieszczali się z miejsca na miejsce', 1, 27, 0),
+(125, 'malowidła naskalne', 1, 28, 0),
+(126, 'troska o pochówek zmarłych', 1, 28, 0),
+(127, 'wytwarzanie ozdobnych naczyń ceramicznych', 0, 28, 0),
+(128, 'budowa stałych osiedli', 0, 28, 0),
+(129, '', NULL, 16, 0),
+(130, '', NULL, 18, 0),
+(131, '', NULL, 23, 0),
+(132, '', NULL, 29, 0),
+(133, 'does', 0, 32, 1),
+(134, 'is', 0, 32, 1),
+(135, 'do', 1, 32, 1),
+(136, 'does', 0, 32, 0),
+(137, 'is', 0, 32, 0),
+(138, 'do', 1, 32, 0),
+(139, 'be', 0, 33, 0),
+(140, 'is', 1, 33, 0),
+(141, 'does', 0, 33, 0),
+(142, 'has', 0, 34, 0),
+(143, 'got', 1, 34, 0),
+(144, 'get', 0, 34, 0),
+(145, 'cook', 0, 35, 0),
+(146, 'cooking', 1, 35, 0),
+(147, 'cooked', 0, 35, 0),
+(148, 'the', 0, 36, 0),
+(149, 'a', 0, 36, 0),
+(150, 'an', 1, 36, 0),
+(151, 'the bigger', 0, 37, 0),
+(152, 'bigger', 1, 37, 0),
+(153, 'biggest', 0, 37, 0),
+(154, 'in', 1, 38, 0),
+(155, 'with', 0, 38, 0),
+(156, 'on', 0, 38, 0),
+(157, 'any', 0, 39, 0),
+(158, 'no', 1, 39, 0),
+(159, 'none', 0, 39, 0),
+(160, 'like', 1, 40, 0),
+(161, 'look', 0, 40, 0),
+(162, 'seem', 0, 40, 0),
+(163, 'by', 0, 41, 0),
+(164, 'on', 1, 41, 0),
+(165, 'with', 0, 41, 0),
+(166, 'Galileusz', 0, 42, 0),
+(167, 'Johannes Kepler', 0, 42, 0),
+(168, 'Izaac Newton', 1, 42, 0),
+(169, 'Albert Einstein', 0, 42, 0),
+(170, 'F=G*(mM/r^2)', 1, 43, 0),
+(171, 'F=Gm*Mr', 0, 43, 0),
+(172, 'F=G*(mM/r)', 0, 43, 0),
+(173, 'F=Gm*Mr^2', 0, 43, 0),
+(174, 'siłą 0 N, ponieważ Ziemia, w przeciwieństwie do jabłka, nie porusza się', 0, 44, 0),
+(175, 'siłą o bardzo małej wartości, ponieważ masa jabłka jest dużo mniejsza od masy ziemi', 0, 44, 0),
+(176, 'siłą 3 N, czyli siłą o takiej samej wartości co Ziema działająca na jabłko', 1, 44, 0),
+(177, '5 m/s^2', 0, 45, 0),
+(178, '10 m/s^2', 1, 45, 0),
+(179, '15 m/s^2', 0, 45, 0),
+(180, '20 m/s^2', 0, 45, 0),
+(181, 'wysokości', 0, 46, 0),
+(182, 'kształtu Ziemi', 0, 46, 0),
+(183, 'szerokości geograficznej', 0, 46, 0),
+(184, 'temperatury', 1, 46, 0),
+(185, 'N', 0, 47, 0),
+(186, 'J * m', 1, 47, 0),
+(187, 'J', 0, 47, 0),
+(188, 'N/m', 0, 47, 0),
+(189, '-1,9 * 10^7 J', 1, 48, 0),
+(190, '-1,9 * 10^8 J', 0, 48, 0),
+(191, '-1,9 * 10^9 J', 0, 48, 0),
+(192, '-1,9 * 10^10 J', 0, 48, 0),
+(193, '1', 0, 49, 1),
+(194, '1', 0, 49, 0),
+(195, '2', 0, 49, 0),
+(196, '3', 1, 49, 0),
+(197, '4', 0, 49, 0),
+(198, 'kwadrat okresu T ruchu planety po orbicie wokół Słońca jest proporcjonalna do sześcianu półosi wielkiej alfa tej orbity', 0, 50, 0),
+(199, 'siła oddziaływania grawitacyjnego pomiędzy dwoma ciałami jest wprost proporcjonalna do iloczynu tych mas i odwrotnie proporcjonalna do kwadratu odległości pomiędzy ich środkami', 0, 50, 0),
+(200, 'linia łącząca planetę ze Słońcem zakreśla w równych odstępach czasu jednakowe pola powierzchni deltaS w płaszczyźnie orbity', 0, 50, 0),
+(201, 'wszystkie planety poruszają się po eliptycznych orbitach, w których ognisku znajduje się Słońce', 1, 50, 0),
+(202, 'dsadasdas', NULL, 16, 0),
+(203, 'asdasda', NULL, 18, 0),
+(204, 'dsadasdas', NULL, 23, 0),
+(205, 'asdasdasd', NULL, 29, 0);
 
 -- --------------------------------------------------------
 
@@ -494,7 +621,10 @@ INSERT INTO `groups` (`id`, `name`, `account_id`) VALUES
 (16, 'Grupa 1', 2),
 (20, 'Grupa 3', 1),
 (21, 'Grupa 4', 2),
-(22, 'Grupa 5', 8);
+(22, 'Grupa 5', 8),
+(23, 'Historia - Początki Ludzkości', 2),
+(24, 'Angielski - poziom podstawowy', 2),
+(25, 'Fizyka - Grawitacja - poziom podstawowy', 2);
 
 -- --------------------------------------------------------
 
@@ -519,7 +649,13 @@ INSERT INTO `link_account_activated_tests` (`id`, `account_id`, `activated_test_
 (2, 2, 7, 1000, 0),
 (3, 8, 5, 20, 1),
 (13, 11, 11, 1000, 0),
-(21, 11, 14, 1, 0);
+(21, 11, 14, 1, 0),
+(22, 11, 15, 4, 0),
+(23, 11, 16, 0, 0),
+(24, 11, 17, 0, 0),
+(25, 11, 18, 8, 0),
+(26, 11, 20, 4, 0),
+(27, 11, 21, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -548,7 +684,49 @@ INSERT INTO `link_account_activated_tests_answer` (`id`, `link_account_activated
 (19, 13, 81, 0, 1, 0),
 (20, 13, 80, 0, 1, 0),
 (21, 21, 85, 0, 13, 1),
-(22, 21, 83, 0, 1, 0);
+(22, 21, 83, 0, 1, 0),
+(23, 22, 98, 0, 14, 0),
+(24, 22, 99, 0, 14, 0),
+(26, 23, 96, 0, 14, 0),
+(28, 24, 129, 0, 16, 0),
+(29, 24, 130, 0, 18, 0),
+(30, 24, 103, 0, 19, 0),
+(31, 24, 131, 0, 23, 0),
+(32, 24, 125, 0, 28, 0),
+(33, 24, 126, 0, 28, 0),
+(34, 24, 132, 0, 29, 0),
+(35, 25, 143, 0, 34, 0),
+(36, 25, 144, 0, 34, 0),
+(37, 25, 145, 0, 35, 0),
+(38, 25, 146, 0, 35, 0),
+(39, 25, 153, 0, 37, 0),
+(40, 25, 154, 0, 38, 0),
+(41, 25, 159, 0, 39, 0),
+(42, 25, 160, 0, 40, 0),
+(43, 25, 164, 0, 41, 0),
+(44, 26, 167, 0, 42, 0),
+(45, 26, 170, 0, 43, 0),
+(46, 26, 171, 0, 43, 0),
+(47, 26, 175, 0, 44, 0),
+(48, 26, 176, 0, 44, 0),
+(49, 26, 179, 0, 45, 0),
+(50, 26, 180, 0, 45, 0),
+(51, 26, 182, 0, 46, 0),
+(52, 26, 183, 0, 46, 0),
+(53, 26, 188, 0, 47, 0),
+(54, 26, 191, 0, 48, 0),
+(55, 26, 196, 0, 49, 0),
+(56, 26, 199, 0, 50, 0),
+(57, 27, 89, 0, 14, 0),
+(58, 27, 90, 0, 14, 0),
+(59, 27, 96, 0, 15, 0),
+(60, 27, 202, 0, 16, 0),
+(61, 27, 101, 0, 17, 0),
+(62, 27, 203, 0, 18, 0),
+(63, 27, 204, 0, 23, 0),
+(64, 27, 114, 0, 24, 0),
+(65, 27, 125, 0, 28, 0),
+(66, 27, 205, 0, 29, 0);
 
 --
 -- Wyzwalacze `link_account_activated_tests_answer`
@@ -623,7 +801,43 @@ INSERT INTO `link_groups_questions` (`id`, `question_id`, `group_id`) VALUES
 (44, 13, 15),
 (45, 1, 16),
 (46, 1, 20),
-(47, 1, 22);
+(47, 1, 22),
+(49, 14, 23),
+(51, 15, 23),
+(52, 16, 23),
+(53, 17, 23),
+(54, 18, 23),
+(55, 19, 23),
+(56, 20, 23),
+(57, 21, 23),
+(58, 22, 23),
+(59, 23, 23),
+(60, 24, 23),
+(61, 25, 23),
+(62, 26, 23),
+(63, 27, 23),
+(64, 28, 23),
+(65, 29, 23),
+(66, 30, 23),
+(68, 32, 24),
+(69, 33, 24),
+(70, 34, 24),
+(71, 35, 24),
+(72, 36, 24),
+(73, 37, 24),
+(74, 38, 24),
+(75, 39, 24),
+(76, 40, 24),
+(77, 41, 24),
+(78, 42, 25),
+(79, 43, 25),
+(80, 44, 25),
+(81, 45, 25),
+(82, 46, 25),
+(83, 47, 25),
+(84, 48, 25),
+(86, 49, 25),
+(87, 50, 25);
 
 -- --------------------------------------------------------
 
@@ -674,7 +888,11 @@ INSERT INTO `link_tests_groups` (`id`, `test_id`, `group_id`, `question_count`) 
 (8, 8, 16, 0),
 (9, 4, 20, 5),
 (10, 5, 21, 10),
-(11, 6, 22, 15);
+(11, 6, 22, 15),
+(12, 9, 23, 16),
+(13, 10, 23, 16),
+(14, 11, 24, 10),
+(15, 12, 25, 9);
 
 -- --------------------------------------------------------
 
@@ -721,7 +939,44 @@ INSERT INTO `questions` (`id`, `opened`, `text`, `points`, `account_id`) VALUES
 (6, 0, 'Czy lubisz programowanie?', 5, 2),
 (7, 1, 'Opisz swoje doświadczenie w programowaniu.', 10, 2),
 (8, 0, 'Czy jesteś zadowolony z nauki programowania?', 7, 2),
-(13, 1, 'Otwarte?', 0, 2);
+(13, 1, 'Otwarte?', 0, 2),
+(14, 0, 'Wskaż prawidłowe zakończenie zdania\r\nNasi przodkowie wywodzą się z:', 2, 2),
+(15, 0, 'Wskaż zmiany, które w życiu człowieka spowodowała rewolucja neolityczna.', 3, 2),
+(16, 1, 'Napisz nazwę epoki, która nastąpiła po epoce kamienia.', 5, 2),
+(17, 0, 'Wskaż prawidłowe zakończenie zdania\r\nCzłowiek myślący to:', 2, 2),
+(18, 1, 'Napisz nazwę rewolucji, która zapoczątkowała rozwój rolnictwa i osiadły tryb życia.', 5, 2),
+(19, 0, 'Wskaż nazwę epoki, podczas której dokonała się rewolucja neolityczna.', 2, 2),
+(20, 0, 'Określ, czy poniższe zdanie jest prawdziwe, czy fałszywe\r\nEpoka żelaza nastąpiła po epoce kamienia.', 2, 2),
+(21, 0, 'Określ, czy poniższe zdanie jest prawdziwe, czy fałszywe:\r\nPraludzie prowadzili koczowniczy tryb życia.', 2, 2),
+(22, 0, 'Określ, czy poniższe zdanie jest prawdziwe, czy fałszywe\r\nOsiadły tryb życia rozpowszechnił się w wyniku rewolucji neolitycznej.', 2, 2),
+(23, 1, 'Napisz nazwę najstarszego gatunku praludzi.', 5, 2),
+(24, 0, 'Wskaż dwa osiągnięcia homo erectusa - człowieka wyprostowanego.', 3, 2),
+(25, 0, 'Wskaż dwa źródła utrzymania praludzi.', 3, 2),
+(26, 0, 'Określ, czy poniższe zdanie jest prawdziwe, czy fałszywe:\r\nAustralopitek opanował sztukę uprawy roślin i hodowli zwierząt.\r\n', 2, 2),
+(27, 0, 'Wskaż prawidłowe zakończenie zdania\r\nPierwotni ludzie prowadzili koczowniczy tryb życia, co oznacza, że:', 2, 2),
+(28, 0, 'Wskaż dwa przejawy rozwoju kultury w okresie paleolitu.', 3, 2),
+(29, 1, 'Napisz nazwę kontynentu, w którym narodził się praczłowiek.', 5, 2),
+(30, 0, '我在做什麼，這只是一個測試', 0, 2),
+(31, 0, '我在做什麼，這只是一個測試', 0, 2),
+(32, 0, 'Where _______ your grandparents live?', 2, 2),
+(33, 0, 'What _______ your favourite colour?', 2, 2),
+(34, 0, 'Have you _______ a car?', 2, 2),
+(35, 0, 'Do you like _______?', 2, 2),
+(36, 0, 'My uncle is _______ actor.', 2, 2),
+(37, 0, 'London is _______ than Bristol.', 2, 2),
+(38, 0, 'Tom is interested _______ football.', 2, 2),
+(39, 0, 'There is _______ milk in the fridge.', 2, 2),
+(40, 0, 'What’s the weather _______ today?', 2, 2),
+(41, 0, 'Can I get to this station _______ foot from here?', 2, 2),
+(42, 0, 'Kto sformułował prawo powszechnego ciążenia?', 2, 2),
+(43, 0, 'Dwa ciała o masach m  oraz M  znajdują się w odległości r. Siłę przyciągania grawitacyjnego pomiędzy tymi ciałami prawidłowo opisuje wzór:', 2, 2),
+(44, 0, 'Na spadające z drzewa jabłko Ziemia działa siłą grawitacyjną o wartości trzech niutonów. Jabłko działa na Ziemię', 2, 2),
+(45, 0, 'Przybliżona wartość przyspieszenia grawitacyjnego g  w pobliżu powierzchni Ziemi wynosi', 2, 2),
+(46, 0, 'Przyspieszenie grawitacyjne Ziemi nie zależy od', 2, 2),
+(47, 0, 'Jednostką grawitacyjnej energii potencjalnej jest:', 2, 2),
+(48, 0, 'Grawitacyjna energia potencjalna ciała o masie m  = 300 g znajdującego się na wysokości h  = 100 km nad powierzchnią Ziemi wynosi (masa Ziemi M  = 6 ⋅ 1024 kg, promień Ziemi r  = 6370 km):\r\n', 2, 2),
+(49, 0, 'Ile praw opisujących ruch planet sformułował Johannes Kepler?', 2, 2),
+(50, 0, 'Zgodnie z pierwszym prawem Keplera', 2, 2);
 
 -- --------------------------------------------------------
 
@@ -768,7 +1023,11 @@ INSERT INTO `tests` (`id`, `name`, `time`, `account_id`) VALUES
 (5, 'Test', 10, NULL),
 (6, 'Test3', 10, NULL),
 (7, 'Test', 10, 2),
-(8, 'Test4', 1, 2);
+(8, 'Test4', 1, 2),
+(9, 'Historia - Początki Ludzkości', 30, 2),
+(10, 'gfgf', 30, 2),
+(11, 'Angielski - Poziom Podstawowy', 30, 2),
+(12, 'Fizyka - Grawitacja - Poziom Podstawowy', 30, 2);
 
 --
 -- Indeksy dla zrzutów tabel
@@ -895,37 +1154,37 @@ ALTER TABLE `accounts`
 -- AUTO_INCREMENT for table `activated_tests`
 --
 ALTER TABLE `activated_tests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `answers`
 --
 ALTER TABLE `answers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=206;
 
 --
 -- AUTO_INCREMENT for table `groups`
 --
 ALTER TABLE `groups`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `link_account_activated_tests`
 --
 ALTER TABLE `link_account_activated_tests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `link_account_activated_tests_answer`
 --
 ALTER TABLE `link_account_activated_tests_answer`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 
 --
 -- AUTO_INCREMENT for table `link_groups_questions`
 --
 ALTER TABLE `link_groups_questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT for table `link_organisations_accounts`
@@ -937,7 +1196,7 @@ ALTER TABLE `link_organisations_accounts`
 -- AUTO_INCREMENT for table `link_tests_groups`
 --
 ALTER TABLE `link_tests_groups`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `organisations`
@@ -949,7 +1208,7 @@ ALTER TABLE `organisations`
 -- AUTO_INCREMENT for table `questions`
 --
 ALTER TABLE `questions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `question_image`
@@ -961,7 +1220,7 @@ ALTER TABLE `question_image`
 -- AUTO_INCREMENT for table `tests`
 --
 ALTER TABLE `tests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables

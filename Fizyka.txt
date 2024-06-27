@@ -1,0 +1,61 @@
+Kto sformułował prawo powszechnego ciążenia?
+Galileusz
+Johannes Kepler
+Izaac Newton +
+Albert Einstein
+
+Dwa ciała o masach m  oraz M  znajdują się w odległości r. Siłę przyciągania grawitacyjnego pomiędzy tymi ciałami prawidłowo opisuje wzór:
+
+F=G * (mM/r^2) +
+F=Gm*Mr
+F=G*(mM/r)
+F=Gm*Mr^2
+
+Na spadające z drzewa jabłko Ziemia działa siłą grawitacyjną o wartości trzech niutonów. Jabłko działa na Ziemię
+
+siłą 0 N, ponieważ Ziemia, w przeciwieństwie do jabłka, nie porusza się
+siłą o bardzo małej wartości, ponieważ masa jabłka jest dużo mniejsza od masy ziemi
+siłą 3n, czyli siłą o takiej samej wartości co Ziema działająca na jabłko +
+
+Przybliżona wartość przyspieszenia grawitacyjnego g  w pobliżu powierzchni Ziemi wynosi
+
+5 m/s^2
+10 m/s^2+
+15 m/s^2
+20 m/s^2
+
+Przyspieszenie grawitacyjne Ziemi nie zależy od
+wysokości
+kształtu Ziemi
+szerokości geograficznej
+temperatury +
+
+Jednostką grawitacyjnej energii potencjalnej jest:
+N
+J * m
+J +
+N/m
+
+Grawitacyjna energia potencjalna ciała o masie m  = 300 g znajdującego się na wysokości h  = 100 km nad powierzchnią Ziemi wynosi (masa Ziemi M  = 6 ⋅ 1024 kg, promień Ziemi r  = 6370 km):
+
+-1,9 * 10^7 J +
+-1,9 * 10^8 J
+-1,9 * 10^9 J
+-1,9 * 10^10 J
+
+Ile praw opisujących ruch planet sformułował Johannes Kepler?
+
+1
+2
+3+
+4
+
+Zgodnie z pierwszym prawem Keplera
+
+kwadrat okresu T ruchu planety po orbicie wokół Słońca jest proporcjonalna do sześcianu półosi wielkiej alfa tej orbity
+
+siła oddziaływania grawitacyjnego pomiędzy dwoma ciałami jest wprost proporcjonalna do iloczynu tych mas i odwrotnie proporcjonalna do kwadratu odległości pomiędzy ich środkami
+
+linia łącząca planetę ze Słońcem zakreśla w równych odstępach czasu jednakowe pola powierzchni deltaS w płaszczyźnie orbity
+
+wszystkie planety poruszają się po eliptycznych orbitach, w których ognisku znajduje się Słońce
